@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XProxy", "XProxy\XProxy.csproj", "{E2BA9F2D-AE8E-40AD-A18D-CB99AF3EE765}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XP", "XP\XP.csproj", "{4D7D2273-F63B-498C-BD82-A4CB929A461B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpFilter", "HttpFilter\HttpFilter.csproj", "{33BA8DD2-E0E7-4605-A074-109222C39FD9}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs02.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = HttpFilter\\HttpFilter.csproj
+		SccProjectName1 = HttpFilter
+		SccLocalPath1 = HttpFilter
+		SccProjectUniqueName2 = XP\\XP.csproj
+		SccProjectName2 = XP
+		SccLocalPath2 = XP
+		SccProjectUniqueName3 = XProxy\\XProxy.csproj
+		SccProjectName3 = XProxy
+		SccLocalPath3 = XProxy
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2BA9F2D-AE8E-40AD-A18D-CB99AF3EE765}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2BA9F2D-AE8E-40AD-A18D-CB99AF3EE765}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2BA9F2D-AE8E-40AD-A18D-CB99AF3EE765}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2BA9F2D-AE8E-40AD-A18D-CB99AF3EE765}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D7D2273-F63B-498C-BD82-A4CB929A461B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D7D2273-F63B-498C-BD82-A4CB929A461B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D7D2273-F63B-498C-BD82-A4CB929A461B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D7D2273-F63B-498C-BD82-A4CB929A461B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33BA8DD2-E0E7-4605-A074-109222C39FD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33BA8DD2-E0E7-4605-A074-109222C39FD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33BA8DD2-E0E7-4605-A074-109222C39FD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33BA8DD2-E0E7-4605-A074-109222C39FD9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
