@@ -57,7 +57,7 @@ namespace XProxy.Plugin
         /// </summary>
         /// <param name="session">客户端</param>
         /// <returns>是否允许通行</returns>
-        public virtual bool OnClientStart(Session session)
+        public virtual Boolean OnClientStart(Session session)
         {
             return true;
         }
@@ -67,7 +67,7 @@ namespace XProxy.Plugin
         /// </summary>
         /// <param name="session">客户端</param>
         /// <returns>是否允许通行</returns>
-        public virtual bool OnServerStart(Session session)
+        public virtual Boolean OnServerStart(Session session)
         {
             return true;
         }
@@ -78,7 +78,7 @@ namespace XProxy.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>经过处理后的数据</returns>
-        public virtual byte[] OnClientToServer(Session session, byte[] Data)
+        public virtual Byte[] OnClientToServer(Session session, Byte[] Data)
         {
             return Data;
         }
@@ -89,7 +89,7 @@ namespace XProxy.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>经过处理后的数据</returns>
-        public virtual byte[] OnServerToClient(Session session, byte[] Data)
+        public virtual Byte[] OnServerToClient(Session session, Byte[] Data)
         {
             return Data;
         }
@@ -107,16 +107,16 @@ namespace XProxy.Plugin
         {
             get
             {
-                PluginConfig pc = new PluginConfig();
+                var pc = new PluginConfig();
                 //pc.Name = "未命名插件";
-				pc.Name = this.GetType().Name;
+				pc.Name = GetType().Name;
 				pc.Author = "无名";
-                pc.ClassName = this.GetType().FullName;
+                pc.ClassName = GetType().FullName;
 				//如果是内部插件，则只显示类名，而不显示全名
-				if (Assembly.GetExecutingAssembly() == this.GetType().Assembly)
-					pc.ClassName = this.GetType().Name;
-				pc.Version = this.GetType().Assembly.GetName().Version.ToString();
-				pc.Path = System.IO.Path.GetFileName(this.GetType().Assembly.Location);
+				if (Assembly.GetExecutingAssembly() == GetType().Assembly)
+					pc.ClassName = GetType().Name;
+				pc.Version = GetType().Assembly.GetName().Version.ToString();
+				pc.Path = System.IO.Path.GetFileName(GetType().Assembly.Location);
 				return pc;
             }
         }
@@ -150,7 +150,7 @@ namespace XProxy.Plugin
         /// 已重载。
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
+        public override String ToString()
         {
             return Config == null ? base.ToString() : Config.ToString();
         }

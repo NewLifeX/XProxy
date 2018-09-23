@@ -11,9 +11,9 @@ namespace HttpFilter
     /// </summary>
     public class IPFilter : PluginBase
     {
-        public override bool OnClientStart(Session client)
+        public override Boolean OnClientStart(Session client)
         {
-            String ip = client.IPAndPort;
+            var ip = client.IPAndPort;
             if (ip.IndexOf(":") > 0) ip = ip.Substring(0, ip.IndexOf(":"));
             return ip != "127.0.0.1";
         }
@@ -22,7 +22,7 @@ namespace HttpFilter
         {
             get
             {
-				PluginConfig pc = base.DefaultConfig;
+				var pc = base.DefaultConfig;
                 pc.Name = "IP过滤器";
                 pc.Author = "大石头";
                 return pc;

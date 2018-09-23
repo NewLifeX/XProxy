@@ -20,7 +20,7 @@ namespace XProxy.Http.Plugin
         /// <param name="session">客户端</param>
         /// <param name="requestheader">请求头</param>
         /// <returns>处理后的请求头</returns>
-        public override string OnRequestHeader(Session session, string requestheader)
+        public override String OnRequestHeader(Session session, String requestheader)
         {
             return ProcessHttpRequestHeader(requestheader);
         }
@@ -33,7 +33,7 @@ namespace XProxy.Http.Plugin
         {
             get
             {
-                PluginConfig pc = base.DefaultConfig;
+                var pc = base.DefaultConfig;
                 pc.Name = "反向代理";
                 pc.Author = "大石头";
                 return pc;
@@ -52,14 +52,14 @@ namespace XProxy.Http.Plugin
             if (String.IsNullOrEmpty(header)) return header;
 
             // 找到HTTP头，尝试修正请求地址和主机HOST
-            String[] headers = header.Split(new String[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var headers = header.Split(new String[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             if (headers == null) return header;
 
             // 重新拼接HTTP请求头
-            StringBuilder sb = new StringBuilder();
-            foreach (String s in headers)
+            var sb = new StringBuilder();
+            foreach (var s in headers)
             {
-                String ss = s.ToLower();
+                var ss = s.ToLower();
                 if (ss.StartsWith("host:"))
                 {
                     sb.Append("Host: ");

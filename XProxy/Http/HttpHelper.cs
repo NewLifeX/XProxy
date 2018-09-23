@@ -21,7 +21,7 @@ namespace XProxy
         /// <returns></returns>
         public static String[] ParseHeader(Byte[] bts)
         {
-            int p = ByteHelper.IndexOf(bts, "\r\n\r\n");
+            var p = ByteHelper.IndexOf(bts, "\r\n\r\n");
             if (p < 0) return null;
             return Encoding.ASCII.GetString(ByteHelper.SubBytes(bts, 0, p)).Split(new String[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
         }
@@ -33,7 +33,7 @@ namespace XProxy
         /// <returns></returns>
         public static Boolean IsHttpRequest(Byte[] bts)
         {
-            String key = "GET ";
+            var key = "GET ";
             if (bts == null || bts.Length < key.Length) return false;
             if (ByteHelper.StartWith(bts, key)) return true;
             if (ByteHelper.StartWith(bts, "POST ")) return true;
@@ -47,7 +47,7 @@ namespace XProxy
         /// <returns></returns>
         public static Boolean IsHttpResponse(Byte[] bts)
         {
-            String key = "HTTP/1.";
+            var key = "HTTP/1.";
             if (bts == null || bts.Length < key.Length) return false;
             if (ByteHelper.StartWith(bts, key)) return true;
             return false;
@@ -64,10 +64,10 @@ namespace XProxy
             if (String.IsNullOrEmpty(header)) return header;
 
             // 找到HTTP头，尝试修正请求地址和主机HOST
-            String[] headers = header.Split(new String[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var headers = header.Split(new String[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             if (headers == null) return header;
 
-            Uri uri = GetUriFromHeader(header);
+            var uri = GetUriFromHeader(header);
             session.ServerPort = 80;
 			session.ServerPort = uri.Port;
             try
@@ -81,10 +81,10 @@ namespace XProxy
             }
 
             // 重新拼接HTTP请求头
-            StringBuilder sb = new StringBuilder();
-            foreach (String s in headers)
+            var sb = new StringBuilder();
+            foreach (var s in headers)
             {
-                String ss = s.ToLower();
+                var ss = s.ToLower();
                 if (ss.StartsWith("get "))
                 {
                     sb.Append("GET ");
@@ -121,9 +121,9 @@ namespace XProxy
             if (header.IndexOf("\r\n") < 0) return null;
             header = header.Substring(0, header.IndexOf("\r\n"));
 
-            int i = header.IndexOf(" ");
+            var i = header.IndexOf(" ");
             if (i < 0) return null;
-            int j = header.IndexOf(" ", i + 1);
+            var j = header.IndexOf(" ", i + 1);
             if (j < 0) return null;
             return new Uri(header.Substring(i + 1, j - i));
         }

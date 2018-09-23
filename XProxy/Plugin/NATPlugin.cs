@@ -17,7 +17,7 @@ namespace XProxy.Plugin
         {
             get
             {
-                PluginConfig pc = base.DefaultConfig;
+                var pc = base.DefaultConfig;
                 pc.Author = "大石头";
                 pc.Name = "NAT插件";
                 return pc;

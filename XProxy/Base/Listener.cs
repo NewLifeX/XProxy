@@ -35,7 +35,7 @@ namespace XProxy.Base
                     catch (Exception ex)
                     {
                         Dispose();
-                        String msg = "获取[" + Config.Address + "]的IP地址时出错！";
+                        var msg = "获取[" + Config.Address + "]的IP地址时出错！";
                         WriteLog(msg);
                         XTrace.WriteLine(msg);
                         throw ex;
@@ -98,10 +98,7 @@ namespace XProxy.Base
         /// 初始化监听器类的新实例
         /// </summary>
         /// <param name="config"></param>
-        public Listener(ListenerConfig config)
-        {
-            Config = config;
-        }
+        public Listener(ListenerConfig config) => Config = config;
         #endregion
 
         #region 开始/停止
@@ -112,31 +109,35 @@ namespace XProxy.Base
         {
             if (Plugin == null)
             {
-                Plugin = new PluginManager();
-                Plugin.Listener = this;
+                Plugin = new PluginManager
+                {
+                    Listener = this
+                };
                 if (Config.IsShow && OnWriteLog != null) Plugin.OnWriteLog += new WriteLogDelegate(WriteLog);
                 Plugin.OnInit(this);
             }
 
             try
             {
-                int plugincount = Plugin.Plugins == null ? 0 : Plugin.Plugins.Count;
+                var plugincount = Plugin.Plugins == null ? 0 : Plugin.Plugins.Count;
                 WriteLog(String.Format("开始监听 {0}:{1} [{2}] 插件：{3}个", Address.ToString(), Config.Port, Config.Name, plugincount));
                 if (TcpServer != null) Stop();
-                TcpServer = new TcpListener(Address, Config.Port);
-                // 指定 TcpListener 是否只允许一个基础套接字来侦听特定端口。
-                // 只有监听任意IP的时候，才打开 ExclusiveAddressUse
-                TcpServer.ExclusiveAddressUse = (Address == IPAddress.Any);
+                TcpServer = new TcpListener(Address, Config.Port)
+                {
+                    // 指定 TcpListener 是否只允许一个基础套接字来侦听特定端口。
+                    // 只有监听任意IP的时候，才打开 ExclusiveAddressUse
+                    ExclusiveAddressUse = (Address == IPAddress.Any)
+                };
                 TcpServer.Start();
                 // 开始异步接受传入的连接
-                TcpServer.BeginAcceptTcpClient(new AsyncCallback(this.OnAccept), TcpServer);
+                TcpServer.BeginAcceptTcpClient(new AsyncCallback(OnAccept), TcpServer);
                 IsDisposed = false;
                 Plugin.OnListenerStart(this);
             }
             catch (Exception ex)
             {
                 Dispose();
-                String msg = "开始监听" + Address.ToString() + ":" + Config.Port + "时出错！" + ex.Message;
+                var msg = "开始监听" + Address.ToString() + ":" + Config.Port + "时出错！" + ex.Message;
                 WriteLog(msg);
                 XTrace.WriteLine(msg);
                 throw ex;
@@ -152,7 +153,7 @@ namespace XProxy.Base
             if (Clients != null)
             {
                 // Dispose时会关闭每个客户端的连接
-                for (int i = Clients.Count - 1; i >= 0; i--)
+                for (var i = Clients.Count - 1; i >= 0; i--)
                     (Clients[i] as Session).Dispose();
                 Clients.Clear();
             }
@@ -170,7 +171,7 @@ namespace XProxy.Base
             }
             catch (Exception ex)
             {
-                String msg = "停止监听" + Address.ToString() + ":" + Config.Port + "时出错！" + ex.Message;
+                var msg = "停止监听" + Address.ToString() + ":" + Config.Port + "时出错！" + ex.Message;
                 WriteLog(msg);
                 XTrace.WriteLine(msg);
                 throw ex;
@@ -195,7 +196,7 @@ namespace XProxy.Base
             try
             {
                 // 先重新开始监听，不要耽误了别的来访者访问
-                TcpServer.BeginAcceptTcpClient(new AsyncCallback(this.OnAccept), TcpServer);
+                TcpServer.BeginAcceptTcpClient(new AsyncCallback(OnAccept), TcpServer);
             }
             catch { Dispose(); }
             try
@@ -203,7 +204,7 @@ namespace XProxy.Base
                 if (tcp != null)
                 {
                     NetHelper.SetKeepAlive(tcp.Client, true, 30000, 30000);
-                    Session NewClient = OnAccept(tcp);
+                    var NewClient = OnAccept(tcp);
                     if (Config.IsShow && OnWriteLog != null) NewClient.OnWriteLog += new WriteLogDelegate(WriteLog);
                     NewClient.OnDestroy += new DestroyDelegate(ClientDestroy);
                     NewClient.Listener = this;
@@ -232,17 +233,14 @@ namespace XProxy.Base
         /// </summary>
         /// <param name="tcp">对应的TcpClient</param>
         /// <returns>客户端实例</returns>
-        public virtual Session OnAccept(TcpClient tcp)
-        {
-            return new Session(tcp, Config.ServerPort, Config.ServerAddress);
-        }
+        public virtual Session OnAccept(TcpClient tcp) => new Session(tcp, Config.ServerPort, Config.ServerAddress);
         #endregion
 
         #region 资源销毁
         /// <summary>
         /// 是否已经销毁
         /// </summary>
-        private bool IsDisposed = false;
+        private Boolean IsDisposed = false;
 
         ///<summary>销毁监听器占用的资源</summary>
         ///<remarks>停止监听，并销毁 <em>所有</em> 客户对象，一旦销毁，对象将不再使用</remarks>

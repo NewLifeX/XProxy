@@ -78,12 +78,12 @@ namespace XProxy.Config
 		public static ProxyConfig Load(String filename)
 		{
 			if (String.IsNullOrEmpty(filename)) filename = DefaultFile;
-			ProxyConfig config = new ProxyConfig();
+			var config = new ProxyConfig();
 			if (File.Exists(filename))
 			{
-				using (StreamReader sr = new StreamReader(filename, Encoding.UTF8))
+				using (var sr = new StreamReader(filename, Encoding.UTF8))
 				{
-					XmlSerializer xs = new XmlSerializer(typeof(ProxyConfig));
+					var xs = new XmlSerializer(typeof(ProxyConfig));
 					try
 					{
 						config = xs.Deserialize(sr) as ProxyConfig;
@@ -107,11 +107,11 @@ namespace XProxy.Config
         {
             if (config == null) return;
             if (String.IsNullOrEmpty(filename)) filename = DefaultFile;
-            using (StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8))
+            using (var sw = new StreamWriter(filename, false, Encoding.UTF8))
             {
                 try
                 {
-                    XmlSerializer xs = new XmlSerializer(typeof(ProxyConfig));
+                    var xs = new XmlSerializer(typeof(ProxyConfig));
                     xs.Serialize(sw, config);
                 }
 				catch (Exception ex)
@@ -125,13 +125,7 @@ namespace XProxy.Config
         /// <summary>
         /// 默认配置文件
         /// </summary>
-        public static String DefaultFile
-        {
-            get
-            {
-                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Proxy.xml");
-            }
-        }
+        public static String DefaultFile => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Proxy.xml");
         #endregion
     }
 }

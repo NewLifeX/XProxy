@@ -23,7 +23,7 @@ namespace XP
             InitializeComponent();
         }
 
-        private void FrmMain_Load(object sender, EventArgs e)
+        private void FrmMain_Load(Object sender, EventArgs e)
         {
             button2.Enabled = false;
             button3.Enabled = false;
@@ -43,7 +43,7 @@ namespace XP
         #endregion
 
         #region 监听器配置
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(Object sender, EventArgs e)
         {
             //新增
             if (Config == null) ProxyConfig.Instance = new ProxyConfig();
@@ -55,7 +55,7 @@ namespace XP
                 lcs = new ListenerConfig[Config.Listeners.Length + 1];
                 Config.Listeners.CopyTo(lcs, 0);
             }
-            ListenerConfig lc = new ListenerConfig();
+            var lc = new ListenerConfig();
             lcs[lcs.Length - 1] = lc;
             lc.Name = "未命名" + lcs.Length.ToString();
             Config.Listeners = lcs;
@@ -65,17 +65,17 @@ namespace XP
             propertyGrid1.SelectedObject = lc;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void button2_Click(Object sender, EventArgs e)
         {
             //删除
             if (listView1.SelectedItems == null || listView1.SelectedItems.Count < 1) return;
 
             if (Config.Listeners == null) return;
-            ListenerConfig lc = listView1.SelectedItems[0].Tag as ListenerConfig;
+            var lc = listView1.SelectedItems[0].Tag as ListenerConfig;
             if (lc == null) return;
 
-            ListenerConfig[] lcs = new ListenerConfig[Config.Listeners.Length - 1];
-            for (int i = 0, j = 0; i < Config.Listeners.Length; i++)
+            var lcs = new ListenerConfig[Config.Listeners.Length - 1];
+            for (Int32 i = 0, j = 0; i < Config.Listeners.Length; i++)
             {
                 if (Config.Listeners[i] != lc) lcs[j++] = Config.Listeners[i];
             }
@@ -85,14 +85,14 @@ namespace XP
             button2.Enabled = false;
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void button3_Click(Object sender, EventArgs e)
         {
             //保存
             ProxyConfig.Save(ProxyConfig.DefaultFile, ProxyConfig.Instance);
             button3.Enabled = false;
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void button4_Click(Object sender, EventArgs e)
         {
             //取消
             ProxyConfig.Instance = ProxyConfig.Load(ProxyConfig.DefaultFile);
@@ -102,20 +102,20 @@ namespace XP
 
         void LoadConfig()
         {
-            ProxyConfig pc = ProxyConfig.Instance;
+            var pc = ProxyConfig.Instance;
             if (pc == null) return;
-            ListenerConfig[] list = pc.Listeners;
+            var list = pc.Listeners;
             if (list == null || list.Length < 1) return;
-            this.Tag = list;
+            Tag = list;
             listView1.Items.Clear();
-            foreach (ListenerConfig lc in list)
+            foreach (var lc in list)
             {
-                String str = lc.Name;
+                var str = lc.Name;
                 if (String.IsNullOrEmpty(str))
                 {
                     str = "未命名";
                 }
-                ListViewItem item = listView1.Items.Add("");
+                var item = listView1.Items.Add("");
                 //item.ImageList = imageList1;
                 item.ImageKey = lc.Enable ? "Ok.ico" : "Delete.ico";
                 item.SubItems.Add(str);
@@ -128,22 +128,22 @@ namespace XP
         #endregion
 
         #region 服务控制
-        private void button5_Click(object sender, EventArgs e)
+        private void button5_Click(Object sender, EventArgs e)
         {
             ControlService(false);
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void button6_Click(Object sender, EventArgs e)
         {
             ControlService(true);
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void button7_Click(Object sender, EventArgs e)
         {
             Program.Install(false);
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void button8_Click(Object sender, EventArgs e)
         {
             Program.Install(true);
         }
@@ -154,9 +154,9 @@ namespace XP
         /// <param name="isstart"></param>
         void ControlService(Boolean isstart)
         {
-            Process p = new Process();
-            ProcessStartInfo si = new ProcessStartInfo();
-            String path = Environment.SystemDirectory;
+            var p = new Process();
+            var si = new ProcessStartInfo();
+            var path = Environment.SystemDirectory;
             path = Path.Combine(path, @"cmd.exe");
             si.FileName = path;
             if (isstart)
@@ -171,7 +171,7 @@ namespace XP
         }
         #endregion
 
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        private void listView1_SelectedIndexChanged(Object sender, EventArgs e)
         {
             if (listView1.SelectedItems == null || listView1.SelectedItems.Count < 1)
             {
@@ -184,17 +184,17 @@ namespace XP
             button2.Enabled = true;
         }
 
-        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        private void propertyGrid1_PropertyValueChanged(Object s, PropertyValueChangedEventArgs e)
         {
             //允许保存
             button3.Enabled = true;
-            Object obj = propertyGrid1.SelectedObject;
+            var obj = propertyGrid1.SelectedObject;
             //if (e.ChangedItem.PropertyDescriptor.Name == "Name") 
             LoadConfig();
             propertyGrid1.SelectedObject = obj;
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void linkLabel1_LinkClicked(Object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start(linkLabel1.Text);
         }
@@ -204,10 +204,10 @@ namespace XP
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button9_Click(object sender, EventArgs e)
+        private void button9_Click(Object sender, EventArgs e)
         {
             //new XProxySvc().StartService();
-            this.Visible = false;
+            Visible = false;
             new ListenerManage().ShowDialog(this);
         }
 

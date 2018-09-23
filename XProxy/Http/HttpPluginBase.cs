@@ -32,16 +32,16 @@ namespace XProxy.Http
 		{
 			get
 			{
-				PluginConfig pc = new PluginConfig();
+				var pc = new PluginConfig();
 				//pc.Name = "Http插件";
-				pc.Name = this.GetType().Name;
+				pc.Name = GetType().Name;
 				pc.Author = "无名";
-				pc.ClassName = this.GetType().FullName;
+				pc.ClassName = GetType().FullName;
 				//如果是内部插件，则只显示类名，而不显示全名
-				if (Assembly.GetExecutingAssembly() == this.GetType().Assembly)
-					pc.ClassName = this.GetType().Name;
-				pc.Version = this.GetType().Assembly.GetName().Version.ToString();
-				pc.Path = System.IO.Path.GetFileName(this.GetType().Assembly.Location);
+				if (Assembly.GetExecutingAssembly() == GetType().Assembly)
+					pc.ClassName = GetType().Name;
+				pc.Version = GetType().Assembly.GetName().Version.ToString();
+				pc.Path = System.IO.Path.GetFileName(GetType().Assembly.Location);
 				return pc;
 			}
 		}
@@ -73,7 +73,7 @@ namespace XProxy.Http
         /// <returns>处理后的请求头数据</returns>
         public virtual Byte[] OnRequestHeader(Session session, Byte[] Data)
         {
-			String header = Encoding.ASCII.GetString(Data);
+			var header = Encoding.ASCII.GetString(Data);
 			header = OnRequestHeader(session, header);
 			return Encoding.ASCII.GetBytes(header);
         }
@@ -86,7 +86,7 @@ namespace XProxy.Http
         /// <returns>处理后的响应头数据</returns>
         public virtual Byte[] OnResponseHeader(Session session, Byte[] Data)
         {
-			String header = Encoding.ASCII.GetString(Data);
+			var header = Encoding.ASCII.GetString(Data);
 			header = OnResponseHeader(session, header);
 			return Encoding.ASCII.GetBytes(header);
 		}
@@ -97,7 +97,7 @@ namespace XProxy.Http
 		/// <param name="session">客户端</param>
 		/// <param name="requestheader">请求头</param>
 		/// <returns>处理后的请求头</returns>
-		public virtual string OnRequestHeader(Session session, string requestheader)
+		public virtual String OnRequestHeader(Session session, String requestheader)
 		{
 			return requestheader;
 		}
@@ -108,7 +108,7 @@ namespace XProxy.Http
 		/// <param name="session">客户端</param>
 		/// <param name="responseheader">响应头</param>
 		/// <returns>处理后的响应头</returns>
-		public virtual string OnResponseHeader(Session session, string responseheader)
+		public virtual String OnResponseHeader(Session session, String responseheader)
 		{
 			return responseheader;
 		}
@@ -121,7 +121,7 @@ namespace XProxy.Http
         /// <param name="session">客户端</param>
         /// <param name="request">请求</param>
         /// <returns>处理后的请求</returns>
-        public virtual string OnRequestBody(Session session, string request)
+        public virtual String OnRequestBody(Session session, String request)
         {
             return request;
         }
@@ -132,7 +132,7 @@ namespace XProxy.Http
         /// <param name="session">客户端</param>
         /// <param name="response">响应</param>
         /// <returns>处理后的响应</returns>
-        public virtual string OnResponseBody(Session session, string response)
+        public virtual String OnResponseBody(Session session, String response)
         {
             return response;
         }
@@ -145,9 +145,9 @@ namespace XProxy.Http
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>处理后的数据</returns>
-        public virtual byte[] OnRequestContent(Session session, byte[] Data)
+        public virtual Byte[] OnRequestContent(Session session, Byte[] Data)
         {
-			String header = Encoding.ASCII.GetString(Data);
+			var header = Encoding.ASCII.GetString(Data);
 			header = OnRequestBody(session, header);
 			return Encoding.ASCII.GetBytes(header);
 		}
@@ -158,7 +158,7 @@ namespace XProxy.Http
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>处理后的数据</returns>
-        public virtual byte[] OnResponseContent(Session session, byte[] Data)
+        public virtual Byte[] OnResponseContent(Session session, Byte[] Data)
         {
 			//String header = Encoding.ASCII.GetString(Data);
 			//header = OnResponseBody(session, header);
@@ -196,7 +196,7 @@ namespace XProxy.Http
         /// 已重载。
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
+        public override String ToString()
         {
             return Config == null ? base.ToString() : Config.ToString();
 		}

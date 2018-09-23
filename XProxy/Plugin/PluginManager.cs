@@ -42,8 +42,8 @@ namespace XProxy.Plugin
 		private void LoadPlugin(IList<PluginConfig> configs)
 		{
 			if (configs == null || configs.Count < 1) return;
-			List<IPlugin> list = new List<IPlugin>();
-			foreach (PluginConfig config in configs)
+			var list = new List<IPlugin>();
+			foreach (var config in configs)
 			{
 				if (!String.IsNullOrEmpty(config.ClassName))
 				{
@@ -52,7 +52,7 @@ namespace XProxy.Plugin
 						asm = Assembly.GetExecutingAssembly();
 					else
 					{
-						String path = config.Path;
+						var path = config.Path;
 						if (!Path.IsPathRooted(path)) path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
 						try
 						{
@@ -66,11 +66,11 @@ namespace XProxy.Plugin
 					}
 					if (asm != null)
 					{
-						Type t = asm.GetType(config.ClassName, false);
+						var t = asm.GetType(config.ClassName, false);
 						if (t == null)
 						{
-							Type[] ts = asm.GetTypes();
-							foreach (Type tt in ts)
+							var ts = asm.GetTypes();
+							foreach (var tt in ts)
 							{
 								if (tt.Name.Contains(config.ClassName))
 								{
@@ -81,10 +81,10 @@ namespace XProxy.Plugin
 						}
 						if (t != null)
 						{
-							Object obj = Activator.CreateInstance(t);
+							var obj = Activator.CreateInstance(t);
 							if (obj != null)
 							{
-								IPlugin p = obj as IPlugin;
+								var p = obj as IPlugin;
 								if (p != null)
 								{
 									p.Config = config;
@@ -110,7 +110,7 @@ namespace XProxy.Plugin
 			LoadPlugin(listener.Config.Plugins);
 			if (Plugins == null || Plugins.Count < 1) return;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Plugins[i].OnWriteLog += new WriteLogDelegate(WriteLog);
 				Plugins[i].OnInit(this);
@@ -124,7 +124,7 @@ namespace XProxy.Plugin
 		{
 			if (Plugins == null || Plugins.Count < 1) return;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Plugins[i].Dispose();
 			}
@@ -138,7 +138,7 @@ namespace XProxy.Plugin
 		{
 			if (Plugins == null || Plugins.Count < 1) return;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Plugins[i].OnListenerStart(listener);
 			}
@@ -152,7 +152,7 @@ namespace XProxy.Plugin
 		{
 			if (Plugins == null || Plugins.Count < 1) return;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Plugins[i].OnListenerStop(listener);
 			}
@@ -167,7 +167,7 @@ namespace XProxy.Plugin
 		{
 			if (Plugins == null || Plugins.Count < 1) return true;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				if (!Plugins[i].OnClientStart(session)) return false;
 			}
@@ -183,7 +183,7 @@ namespace XProxy.Plugin
 		{
 			if (Plugins == null || Plugins.Count < 1) return true;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				if (!Plugins[i].OnServerStart(session)) return false;
 			}
@@ -203,7 +203,7 @@ namespace XProxy.Plugin
 			if (Plugins == null || Plugins.Count < 1) return Data;
 			if (Data == null || Data.Length < 1) return null;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Data = Plugins[i].OnClientToServer(session, Data);
 				if (Data == null || Data.Length < 1) return null;
@@ -222,7 +222,7 @@ namespace XProxy.Plugin
 			if (Plugins == null || Plugins.Count < 1) return Data;
 			if (Data == null || Data.Length < 1) return null;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Data = Plugins[i].OnServerToClient(session, Data);
 				if (Data == null || Data.Length < 1) return null;
@@ -259,16 +259,16 @@ namespace XProxy.Plugin
 			{
 				LoadAllAssembly();
 
-				List<PluginConfig> list = new List<PluginConfig>();
-				foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+				var list = new List<PluginConfig>();
+				foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
 				{
-					foreach (Type t in asm.GetTypes())
+					foreach (var t in asm.GetTypes())
 					{
 						if (t.GetInterface(typeof(IPlugin).Name) != null)
 						{
 							try
 							{
-								IPlugin ip = asm.CreateInstance(t.FullName) as IPlugin;
+								var ip = asm.CreateInstance(t.FullName) as IPlugin;
 								if (ip != null) list.Add(ip.DefaultConfig);
 							}
 							catch { }
@@ -292,17 +292,17 @@ namespace XProxy.Plugin
 			{
 				LoadAllAssembly();
 
-				List<PluginConfig> list = new List<PluginConfig>();
-				foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+				var list = new List<PluginConfig>();
+				foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
 				{
-					foreach (Type t in asm.GetTypes())
+					foreach (var t in asm.GetTypes())
 					{
 						//加上IsAbstract的判断，防止把抽象插件基类识别为插件
 						if (!t.IsAbstract && t.GetInterface(typeof(IHttpPlugin).Name) != null)
 						{
 							try
 							{
-								IHttpPlugin ip = asm.CreateInstance(t.FullName) as IHttpPlugin;
+								var ip = asm.CreateInstance(t.FullName) as IHttpPlugin;
 								if (ip != null) list.Add(ip.DefaultConfig);
 							}
 							catch { }
@@ -318,15 +318,15 @@ namespace XProxy.Plugin
 
 		private static void LoadAllAssembly()
 		{
-			String path = AppDomain.CurrentDomain.BaseDirectory;
+			var path = AppDomain.CurrentDomain.BaseDirectory;
 			//path = Path.Combine(path, "Plugins");
 			if (!Directory.Exists(path)) return;
 
             //不能使用AllDirectories，当很多子目录的时候，会卡死程序
-			String[] fs = Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
+			var fs = Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
 			if (fs == null || fs.Length < 1) return;
 
-			foreach (String s in fs)
+			foreach (var s in fs)
 			{
 				try
 				{

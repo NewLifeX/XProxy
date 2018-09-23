@@ -15,13 +15,13 @@ namespace XP
         [STAThread]
         static void Main()
         {
-            String[] Args = Environment.GetCommandLineArgs();
+            var Args = Environment.GetCommandLineArgs();
 
             if (Args.Length > 1)
             {
                 if (Args[1].ToLower() == "-s")  //启动服务
                 {
-                    ServiceBase[] ServicesToRun = new ServiceBase[] { new XProxySvc() };
+                    var ServicesToRun = new ServiceBase[] { new XProxySvc() };
                     try
                     {
                         ServiceBase.Run(ServicesToRun);
@@ -56,11 +56,11 @@ namespace XP
         /// <param name="isinstall">是否安装</param>
         public static void Install(Boolean isinstall)
         {
-            Process p = new Process();
-            ProcessStartInfo si = new ProcessStartInfo();
+            var p = new Process();
+            var si = new ProcessStartInfo();
             //String path = Environment.GetEnvironmentVariable("SystemRoot");
             //path = Path.Combine(path, @"Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe");
-            String path = Environment.SystemDirectory;
+            var path = Environment.SystemDirectory;
             path = Path.Combine(path, @"sc.exe");
             if (!File.Exists(path)) path = "sc.exe";
             if (!File.Exists(path)) return;

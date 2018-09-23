@@ -22,7 +22,7 @@ namespace XProxy
 			if (buf1 == null || buf1.Length <= 0) return Copy(buf2);
 			if (buf2 == null || buf2.Length <= 0) return Copy(buf1);
 
-            Byte[] buf = new Byte[buf1.Length + buf2.Length];
+            var buf = new Byte[buf1.Length + buf2.Length];
 			//for (int i = 0; i < buf1.Length; i++)
 			//    buf[i] = buf1[i];
 			//for (int i = 0; i < buf2.Length; i++)
@@ -48,7 +48,7 @@ namespace XProxy
 			//直接复制
 			if (index == 0 && count == buf.Length) return Copy(buf);
 
-            Byte[] b = new Byte[count];
+            var b = new Byte[count];
 			//for (int i = 0; i < count; i++)
 			//    b[i] = buf[index + i];
 			Buffer.BlockCopy(buf, index, b, 0, b.Length);
@@ -64,7 +64,7 @@ namespace XProxy
 		{
 			if (buf == null || buf.Length < 1) return null;
 
-			Byte[] bts = new Byte[buf.Length];
+			var bts = new Byte[buf.Length];
 			Buffer.BlockCopy(buf, 0, bts, 0, bts.Length);
 			return bts;
 		}
@@ -91,7 +91,7 @@ namespace XProxy
         {
             if (bts1 == null || bts2 == null) return false;
             if (bts1.Length < bts2.Length) return false;
-            for (int i = 0; i < bts2.Length; i++)
+            for (var i = 0; i < bts2.Length; i++)
             {
                 if (bts1[i] != bts2[i]) return false;
             }
@@ -120,7 +120,7 @@ namespace XProxy
         {
             if (bts1 == null || bts2 == null) return -1;
 
-            for (int i = 0, j = 0; i < bts1.Length; i++, j++)
+            for (Int32 i = 0, j = 0; i < bts1.Length; i++, j++)
             {
                 if (bts1[i] != bts2[j]) // 找到一个不等，把j复位
                     j = -1;
@@ -187,26 +187,26 @@ namespace XProxy
             if (bts2 == null || bts2.Length == 0)
             {
                 //前面空间过大，前移
-                for (int i = start; i < count; i++) bts[i] = bts[length + i];
+                for (var i = start; i < count; i++) bts[i] = bts[length + i];
                 return count - length;
             }
 
-            int off = 0;
+            var off = 0;
             //为新字节数组挪出位置来
             if (length < bts2.Length)
             {
                 //前面空间不够，后移。注意：后移需要从右往左移
                 off = bts2.Length - length;
-                for (int i = count - 1; i >= start + length; i--) bts[off + i] = bts[i];
+                for (var i = count - 1; i >= start + length; i--) bts[off + i] = bts[i];
             }
             else if (length > bts2.Length)
             {
                 //前面空间过大，前移。注意：前移需要从左往右移
                 off = length - bts2.Length;
-                for (int i = start + length - off; i < count; i++) bts[i] = bts[off + i];
+                for (var i = start + length - off; i < count; i++) bts[i] = bts[off + i];
             }
             //如果另一指定字节数组刚好能放进指定区域，就不用移动后面部分了
-            for (int i = 0; i < bts2.Length; i++) bts[start + i] = bts2[i];
+            for (var i = 0; i < bts2.Length; i++) bts[start + i] = bts2[i];
 
             return count + off;
         }
@@ -218,10 +218,10 @@ namespace XProxy
         /// <param name="Count">字节个数</param>
         /// <param name="key">密码</param>
         /// <returns>加密后数据个数</returns>
-        public static int Encrypt(ref Byte[] Data, int Count, String key)
+        public static Int32 Encrypt(ref Byte[] Data, Int32 Count, String key)
         {
-            Byte[] bts = Encoding.ASCII.GetBytes(key);
-            for (int i = 0, j = 0; i < Count; i++, j++)
+            var bts = Encoding.ASCII.GetBytes(key);
+            for (Int32 i = 0, j = 0; i < Count; i++, j++)
             {
                 if (j >= bts.Length) j = 0;
                 Data[i] ^= bts[j];

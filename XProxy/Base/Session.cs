@@ -56,7 +56,7 @@ namespace XProxy.Base
             {
                 if (_Server == null)
                 {
-                    TcpClient tcpclient = ConnectServer(true);
+                    var tcpclient = ConnectServer(true);
                     if (tcpclient != null)
                     {
                         _Server = new Connection(tcpclient);
@@ -304,7 +304,7 @@ namespace XProxy.Base
             {
                 while (true)
                 {
-                    Byte[] buf = Client.Read();
+                    var buf = Client.Read();
                     if (buf == null || buf.Length < 1) break;
                     buf = OnClientToServer(buf);
                     if (buf == null || buf.Length < 1) break;
@@ -327,7 +327,7 @@ namespace XProxy.Base
             {
                 while (true)
                 {
-                    Byte[] buf = Server.Read();
+                    var buf = Server.Read();
                     if (buf == null || buf.Length < 1) break;
                     buf = OnServerToClient(buf);
                     if (buf == null || buf.Length < 1) break;
@@ -428,7 +428,7 @@ namespace XProxy.Base
         ///<summary>输入日志</summary>
         ///<remarks>输入日志信息到UI信息框</remarks>
         ///<param name="log">要输出的日志信息</param>
-        public void WriteLog(string log)
+        public void WriteLog(String log)
         {
             if (OnWriteLog != null)
             {

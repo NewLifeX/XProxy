@@ -145,7 +145,7 @@ namespace XProxy.Config
 				_HttpPlugins = value;
 				//检查Plugins中是否存在HttpPlugin插件，如果没有则加上
 				if (Plugins != null && Plugins.Length > 0)
-					foreach (PluginConfig item in Plugins)
+					foreach (var item in Plugins)
 					{
 						if (item.ClassName == typeof(HttpPlugin).Name ||
 							item.ClassName == typeof(HttpPlugin).FullName)
@@ -153,8 +153,8 @@ namespace XProxy.Config
 							return;
 						}
 					}
-				PluginConfig[] list = new PluginConfig[Plugins == null ? 1 : Plugins.Length + 1];
-				PluginConfig pc = new HttpPlugin().DefaultConfig;
+				var list = new PluginConfig[Plugins == null ? 1 : Plugins.Length + 1];
+				var pc = new HttpPlugin().DefaultConfig;
 				list[list.Length - 1] = pc;
 				Plugins = list;
 			}

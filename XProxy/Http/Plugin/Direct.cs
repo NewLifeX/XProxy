@@ -20,7 +20,7 @@ namespace XProxy.Http.Plugin
         /// <param name="session">客户端</param>
         /// <param name="requestheader">请求头</param>
         /// <returns>处理后的请求头</returns>
-        public override string OnRequestHeader(Session session, string requestheader)
+        public override String OnRequestHeader(Session session, String requestheader)
         {
             return HttpHelper.ProcessHttpRequestHeader(session, requestheader);
         }
@@ -33,7 +33,7 @@ namespace XProxy.Http.Plugin
         {
             get
             {
-                PluginConfig pc = base.DefaultConfig;
+                var pc = base.DefaultConfig;
                 pc.Name = "直接代理";
                 pc.Author = "大石头";
                 return pc;

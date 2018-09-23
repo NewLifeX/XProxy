@@ -48,8 +48,8 @@ namespace XProxy
 		{
 			if (list == null || list.Count < 1) return null;
 
-			Int32 count = 0;
-			for (int i = 0; i < list.Count; i++)
+			var count = 0;
+			for (var i = 0; i < list.Count; i++)
 			{
 				count += list[i].Buf.Length;
 			}
@@ -57,9 +57,9 @@ namespace XProxy
 			if (count < 1) return null;
 
 			//开始连接。不能调用ByteHelper，那样会不断分配内存
-			Byte[] bts = new Byte[count];
-			Int32 pos = 0;
-			for (int i = 0; i < list.Count; i++)
+			var bts = new Byte[count];
+			var pos = 0;
+			for (var i = 0; i < list.Count; i++)
 			{
 				Buffer.BlockCopy(list[i].Buf, 0, bts, pos, list[i].Buf.Length);
 				pos += list[i].Buf.Length;

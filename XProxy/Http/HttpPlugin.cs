@@ -60,8 +60,8 @@ namespace XProxy.Http
 		private void LoadPlugin(IList<PluginConfig> configs)
 		{
 			if (configs == null || configs.Count < 1) return;
-			List<IHttpPlugin> list = new List<IHttpPlugin>();
-			foreach (PluginConfig config in configs)
+			var list = new List<IHttpPlugin>();
+			foreach (var config in configs)
 			{
 				if (!String.IsNullOrEmpty(config.ClassName))
 				{
@@ -70,7 +70,7 @@ namespace XProxy.Http
 						asm = Assembly.GetExecutingAssembly();
 					else
 					{
-						String path = config.Path;
+						var path = config.Path;
 						if (!Path.IsPathRooted(path)) path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
 						try
 						{
@@ -84,11 +84,11 @@ namespace XProxy.Http
 					}
 					if (asm != null)
 					{
-						Type t = asm.GetType(config.ClassName, false);
+						var t = asm.GetType(config.ClassName, false);
 						if (t == null)
 						{
-							Type[] ts = asm.GetTypes();
-							foreach (Type tt in ts)
+							var ts = asm.GetTypes();
+							foreach (var tt in ts)
 							{
 								if (tt.Name.Contains(config.ClassName))
 								{
@@ -99,10 +99,10 @@ namespace XProxy.Http
 						}
 						if (t != null)
 						{
-							Object obj = Activator.CreateInstance(t);
+							var obj = Activator.CreateInstance(t);
 							if (obj != null)
 							{
-								IHttpPlugin p = obj as IHttpPlugin;
+								var p = obj as IHttpPlugin;
 								if (p != null)
 								{
 									p.Config = config;
@@ -130,7 +130,7 @@ namespace XProxy.Http
 			LoadPlugin(manager.Listener.Config.HttpPlugins);
 			if (Plugins == null || Plugins.Count < 1) return;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Plugins[i].OnWriteLog += new WriteLogDelegate(WriteLog);
 				Plugins[i].OnInit(this);
@@ -143,7 +143,7 @@ namespace XProxy.Http
             manager.Listener.Config.IsShowServerData = false;
 		}
 
-		public override bool OnClientStart(Session session)
+		public override Boolean OnClientStart(Session session)
 		{
 			//使用同步
 			//session.IsAsync = false;
@@ -157,7 +157,7 @@ namespace XProxy.Http
 		/// <param name="session">客户端</param>
 		/// <param name="Data">数据</param>
 		/// <returns>经过处理后的数据</returns>
-		public override byte[] OnClientToServer(Session session, byte[] Data)
+		public override Byte[] OnClientToServer(Session session, Byte[] Data)
 		{
 			if (Plugins == null || Plugins.Count < 1) return Data;
 
@@ -167,11 +167,11 @@ namespace XProxy.Http
 
 			if (HttpHelper.IsHttpRequest(Data))
 			{
-				int p = ByteHelper.IndexOf(Data, "\r\n\r\n");
+				var p = ByteHelper.IndexOf(Data, "\r\n\r\n");
 				if (p < 0) return null;
-				Byte[] bts = ByteHelper.SubBytes(Data, 0, p);
+				var bts = ByteHelper.SubBytes(Data, 0, p);
 
-				for (int i = 0; i < Plugins.Count; i++)
+				for (var i = 0; i < Plugins.Count; i++)
 				{
 					bts = Plugins[i].OnRequestHeader(session, bts);
 					//直接阻止
@@ -195,7 +195,7 @@ namespace XProxy.Http
 				if (Data.Length > p + 4)
 				{
 					Data = ByteHelper.SubBytes(Data, p + 4, -1);
-					for (int i = 0; i < Plugins.Count; i++)
+					for (var i = 0; i < Plugins.Count; i++)
 					{
 						Data = Plugins[i].OnRequestContent(session, Data);
 						//直接阻止
@@ -208,7 +208,7 @@ namespace XProxy.Http
 			}
 			else
 			{
-				for (int i = 0; i < Plugins.Count; i++)
+				for (var i = 0; i < Plugins.Count; i++)
 				{
 					Data = Plugins[i].OnRequestContent(session, Data);
 					//直接阻止
@@ -225,24 +225,24 @@ namespace XProxy.Http
 		/// <param name="session">客户端</param>
 		/// <param name="Data">数据</param>
 		/// <returns>经过处理后的数据</returns>
-		public override byte[] OnServerToClient(Session session, byte[] Data)
+		public override Byte[] OnServerToClient(Session session, Byte[] Data)
 		{
 			if (Plugins == null || Plugins.Count < 1) return Data;
 
 			if (HttpHelper.IsHttpResponse(Data))
 			{
-				int p = ByteHelper.IndexOf(Data, "\r\n\r\n");
+				var p = ByteHelper.IndexOf(Data, "\r\n\r\n");
 				if (p < 0) return null;
-				Byte[] bts = ByteHelper.SubBytes(Data, 0, p);
+				var bts = ByteHelper.SubBytes(Data, 0, p);
 
-				for (int i = 0; i < Plugins.Count; i++)
+				for (var i = 0; i < Plugins.Count; i++)
 				{
 					bts = Plugins[i].OnResponseHeader(session, bts);
 					//直接阻止
 					if (bts == null || bts.Length < 1) return null;
 				}
 
-				String header = Encoding.ASCII.GetString(bts);
+				var header = Encoding.ASCII.GetString(bts);
 
 				//对于响应，只能直接显示头部，只有头部可以用ASCII解码
 				if (ShowResponse)
@@ -263,7 +263,7 @@ namespace XProxy.Http
 				if (Data.Length > p + 4)
 				{
 					Data = ByteHelper.SubBytes(Data, p + 4, -1);
-					for (int i = 0; i < Plugins.Count; i++)
+					for (var i = 0; i < Plugins.Count; i++)
 					{
 						Data = Plugins[i].OnResponseContent(session, Data);
 						//直接阻止
@@ -284,7 +284,7 @@ namespace XProxy.Http
                     session.WriteLog("响应数据（" + Data.Length + "Byte）：\n" + Encoding.Default.GetString(Data));
 #endif
                 }
-				for (int i = 0; i < Plugins.Count; i++)
+				for (var i = 0; i < Plugins.Count; i++)
 				{
 					Data = Plugins[i].OnResponseContent(session, Data);
 					//直接阻止
@@ -302,7 +302,7 @@ namespace XProxy.Http
 		{
 			get
 			{
-				PluginConfig pc = base.DefaultConfig;
+				var pc = base.DefaultConfig;
 				pc.Name = "Http插件";
 				pc.Author = "大石头";
 				return pc;
@@ -319,7 +319,7 @@ namespace XProxy.Http
 		{
 			if (Plugins == null || Plugins.Count < 1) return;
 
-			for (int i = 0; i < Plugins.Count; i++)
+			for (var i = 0; i < Plugins.Count; i++)
 			{
 				Plugins[i].Dispose();
 			}

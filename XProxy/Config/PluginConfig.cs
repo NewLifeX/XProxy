@@ -76,9 +76,9 @@ namespace XProxy.Config
 		/// “—÷ÿ‘ÿ
 		/// </summary>
 		/// <returns></returns>
-		public override string ToString()
+		public override String ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 			sb.Append(Name);
 			if (!String.IsNullOrEmpty(Author)) sb.AppendFormat("£®{0}£©", Author);
 			if (!String.IsNullOrEmpty(ClassName)) sb.AppendFormat("£¨{0} V{1}", ClassName, Version);
@@ -107,14 +107,14 @@ namespace XProxy.Config
 		/// </summary>
 		/// <param name="itemType"></param>
 		/// <returns></returns>
-		protected override object CreateInstance(Type itemType)
+		protected override Object CreateInstance(Type itemType)
 		{
-			PluginSelectorForm form = new PluginSelectorForm();
+			var form = new PluginSelectorForm();
 			form.Plugins = PluginManager.AllPlugins;
 			form.ShowDialog();
 			if (form.SelectedItem != null)
 			{
-				PluginConfig pc = form.SelectedItem;
+				var pc = form.SelectedItem;
 				form.Dispose();
 				return pc;
 			}
@@ -142,14 +142,14 @@ namespace XProxy.Config
 		/// </summary>
 		/// <param name="itemType"></param>
 		/// <returns></returns>
-		protected override object CreateInstance(Type itemType)
+		protected override Object CreateInstance(Type itemType)
 		{
-			PluginSelectorForm form = new PluginSelectorForm();
+			var form = new PluginSelectorForm();
 			form.Plugins = PluginManager.AllHttpPlugins;
 			form.ShowDialog();
 			if (form.SelectedItem != null)
 			{
-				PluginConfig pc = form.SelectedItem;
+				var pc = form.SelectedItem;
 				form.Dispose();
 				return pc;
 			}

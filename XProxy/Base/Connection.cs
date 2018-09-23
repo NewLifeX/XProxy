@@ -33,7 +33,7 @@ namespace XProxy.Base
         /// <summary>
         /// 缓存数据
         /// </summary>
-        private byte[] Buffer = new byte[1024 * 8];
+        private Byte[] Buffer = new Byte[1024 * 8];
 
         private Encoding _Encode;
         /// <summary>
@@ -145,7 +145,7 @@ namespace XProxy.Base
             Dispose();
         }
 
-        private void End(string format, params object[] args)
+        private void End(String format, params Object[] args)
         {
             End(String.Format(format, args));
         }
@@ -162,8 +162,8 @@ namespace XProxy.Base
         private void End(Exception ex)
         {
             //取得调用本函数的方法名
-            StackTrace st = new StackTrace(1, true);
-            StackFrame sf = st.GetFrame(0);
+            var st = new StackTrace(1, true);
+            var sf = st.GetFrame(0);
             End(String.Format("{0}->{1}", sf.GetMethod().DeclaringType.FullName, sf.GetMethod().ToString()), ex);
         }
         #endregion
@@ -179,7 +179,7 @@ namespace XProxy.Base
 
             try
             {
-                IAsyncResult iar = Stream.BeginRead(Buffer, 0, Buffer.Length, new AsyncCallback(EndRead), null);
+                var iar = Stream.BeginRead(Buffer, 0, Buffer.Length, new AsyncCallback(EndRead), null);
             }
             catch (Exception ex)
             {
@@ -194,7 +194,7 @@ namespace XProxy.Base
         /// <param name="ar"></param>
         private void EndRead(IAsyncResult ar)
         {
-            int Ret = 0;
+            var Ret = 0;
             if (!Active) return;
 
             try
@@ -216,7 +216,7 @@ namespace XProxy.Base
                 return;
             }
             //取出数据
-            Byte[] buf = ByteHelper.SubBytes(Buffer, 0, Ret);
+            var buf = ByteHelper.SubBytes(Buffer, 0, Ret);
 
             //业务处理
             try
@@ -247,7 +247,7 @@ namespace XProxy.Base
 
             try
             {
-                IAsyncResult iar = Stream.BeginWrite(buf, 0, buf.Length, new AsyncCallback(EndWrite), null);
+                var iar = Stream.BeginWrite(buf, 0, buf.Length, new AsyncCallback(EndWrite), null);
                 CheckTimeOut(iar);
             }
             catch (Exception ex)
@@ -286,8 +286,8 @@ namespace XProxy.Base
         {
             if (!Active) return null;
 
-            List<NetData> list = new List<NetData>();
-            Byte[] buf = new Byte[1024 * 8];
+            var list = new List<NetData>();
+            var buf = new Byte[1024 * 8];
             try
             {
                 //如果没数据，等100ms
@@ -306,7 +306,7 @@ namespace XProxy.Base
                 do
                 {
                     //读数据
-                    Int32 count = Stream.Read(buf, 0, buf.Length);
+                    var count = Stream.Read(buf, 0, buf.Length);
                     if (count == 0) break;
                     list.Add(new NetData(buf, 0, count));
                 } while (Socket.Available != 0 && Socket.Connected);
@@ -348,12 +348,12 @@ namespace XProxy.Base
         /// </summary>
         /// <param name="state">一个对象，包含回调方法在每次执行时要使用的信息</param>
         /// <param name="timedOut">如果 WaitHandle 超时，则为 true；如果其终止，则为 false</param>
-        private void TimeOutCallback(object state, bool timedOut)
+        private void TimeOutCallback(Object state, Boolean timedOut)
         {
             // 如果是因为超时而触发，不是因为对象被销毁而触发
             if (timedOut)
             {
-                IAsyncResult ar = state as IAsyncResult;
+                var ar = state as IAsyncResult;
                 if (ar != null && !ar.IsCompleted)
                 {
                     End("超时退出");
@@ -367,7 +367,7 @@ namespace XProxy.Base
         ///<summary>输入日志</summary>
         ///<remarks>输入日志信息到UI信息框</remarks>
         ///<param name="log">要输出的日志信息</param>
-        public void WriteLog(string log)
+        public void WriteLog(String log)
         {
             Session.WriteLog(String.Format("{0} {1}", Name, log));
         }

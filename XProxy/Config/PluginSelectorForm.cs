@@ -27,14 +27,14 @@ namespace XProxy.Config
 		/// </summary>
 		public PluginConfig[] Plugins { get { return _Plugins; } set { _Plugins = value; } }
 
-		private void PluginSelectorForm_Load(object sender, EventArgs e)
+		private void PluginSelectorForm_Load(Object sender, EventArgs e)
 		{
 			listView1.Items.Clear();
 			if (Plugins == null || Plugins.Length < 1) return;
 
-			foreach (PluginConfig item in Plugins)
+			foreach (var item in Plugins)
 			{
-				ListViewItem lv = listView1.Items.Add(item.Name);
+				var lv = listView1.Items.Add(item.Name);
 				lv.SubItems.Add(item.Author);
 				lv.SubItems.Add(item.ClassName);
 				lv.SubItems.Add(item.Version);
@@ -43,11 +43,11 @@ namespace XProxy.Config
 			}
 		}
 
-		private void listView1_DoubleClick(object sender, EventArgs e)
+		private void listView1_DoubleClick(Object sender, EventArgs e)
 		{
 			if (listView1.SelectedItems == null || listView1.SelectedItems.Count < 1) return;
 			SelectedItem = listView1.SelectedItems[0].Tag as PluginConfig;
-			this.Close();
+			Close();
 		}
 	}
 }

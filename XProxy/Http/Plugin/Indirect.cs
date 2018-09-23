@@ -28,7 +28,7 @@ namespace XProxy.Http.Plugin
         /// <param name="session">客户端</param>
         /// <param name="requestheader">请求头</param>
         /// <returns>处理后的请求头</returns>
-        public override string OnRequestHeader(Session session, string requestheader)
+        public override String OnRequestHeader(Session session, String requestheader)
         {
             if (!IsLocal(session)) requestheader = HttpHelper.ProcessHttpRequestHeader(session, requestheader);
             return requestheader;
@@ -55,7 +55,7 @@ namespace XProxy.Http.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>处理后的请求头数据</returns>
-        public override byte[] OnRequestHeader(Session session, byte[] Data)
+        public override Byte[] OnRequestHeader(Session session, Byte[] Data)
         {
             return Encrypt(Data);
         }
@@ -66,7 +66,7 @@ namespace XProxy.Http.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>处理后的响应头数据</returns>
-        public override byte[] OnResponseHeader(Session session, byte[] Data)
+        public override Byte[] OnResponseHeader(Session session, Byte[] Data)
         {
             return Encrypt(Data);
         }
@@ -77,7 +77,7 @@ namespace XProxy.Http.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>处理后的数据</returns>
-        public override byte[] OnRequestContent(Session session, byte[] Data)
+        public override Byte[] OnRequestContent(Session session, Byte[] Data)
         {
             return Encrypt(Data);
         }
@@ -88,7 +88,7 @@ namespace XProxy.Http.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>处理后的数据</returns>
-		public override byte[] OnResponseContent(Session session, byte[] Data)
+		public override Byte[] OnResponseContent(Session session, Byte[] Data)
         {
             return Encrypt(Data);
         }
@@ -96,7 +96,7 @@ namespace XProxy.Http.Plugin
         private static Byte[] Encrypt(Byte[] Data)
         {
             if (Data == null || Data.Length < 1) return null;
-            for (int i = 0; i < Data.Length; i++)
+            for (var i = 0; i < Data.Length; i++)
             {
                 Data[i] ^= (Byte)('X');
             }
@@ -113,12 +113,12 @@ namespace XProxy.Http.Plugin
             {
                 if (_LocalIPs == null)
                 {
-                    IPAddress[] ips = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-                    List<IPAddress> list = new List<IPAddress>(ips);
+                    var ips = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+                    var list = new List<IPAddress>(ips);
                     list.Add(IPAddress.Any);
                     list.Add(IPAddress.Loopback);
-                    _LocalIPs = new List<string>();
-                    foreach (IPAddress ip in list)
+                    _LocalIPs = new List<String>();
+                    foreach (var ip in list)
                     {
                         _LocalIPs.Add(ip.ToString());
                     }
@@ -134,7 +134,7 @@ namespace XProxy.Http.Plugin
         /// <returns></returns>
         private Boolean IsLocal(Session session)
         {
-            String ip = session.IPAndPort;
+            var ip = session.IPAndPort;
             if (ip.IndexOf(":") > 0) ip = ip.Substring(0, ip.IndexOf(":"));
             return LocalIPs.Contains(ip);
         }
@@ -147,7 +147,7 @@ namespace XProxy.Http.Plugin
         {
             get
             {
-				PluginConfig pc = base.DefaultConfig;
+				var pc = base.DefaultConfig;
                 pc.Name = "间接代理";
                 pc.Author = "大石头";
                 return pc;

@@ -22,11 +22,11 @@ namespace XProxy
         /// <param name="interval">探测时间间隔（单位：毫秒）</param>
         public static void SetKeepAlive(Socket socket,Boolean iskeepalive, Int32 starttime, Int32 interval)
         {
-            uint dummy = 0;
-            byte[] inOptionValues = new byte[Marshal.SizeOf(dummy) * 3];
-            BitConverter.GetBytes((uint)1).CopyTo(inOptionValues, 0);
-            BitConverter.GetBytes((uint)5000).CopyTo(inOptionValues, Marshal.SizeOf(dummy));
-            BitConverter.GetBytes((uint)5000).CopyTo(inOptionValues, Marshal.SizeOf(dummy) * 2);
+            UInt32 dummy = 0;
+            var inOptionValues = new Byte[Marshal.SizeOf(dummy) * 3];
+            BitConverter.GetBytes((UInt32)1).CopyTo(inOptionValues, 0);
+            BitConverter.GetBytes((UInt32)5000).CopyTo(inOptionValues, Marshal.SizeOf(dummy));
+            BitConverter.GetBytes((UInt32)5000).CopyTo(inOptionValues, Marshal.SizeOf(dummy) * 2);
             socket.IOControl(IOControlCode.KeepAliveValues, inOptionValues, null);
         }
         //struct tcp_keepalive
@@ -41,15 +41,15 @@ namespace XProxy
         /// </summary>
         public static void OutStack()
         {
-            StackTrace st = new StackTrace(1);
-            StringBuilder sb = new StringBuilder();
-            StackFrame[] sfs = st.GetFrames();
-            foreach (StackFrame sf in sfs)
+            var st = new StackTrace(1);
+            var sb = new StringBuilder();
+            var sfs = st.GetFrames();
+            foreach (var sf in sfs)
             {
                 sb.Append(sf.GetMethod().DeclaringType.FullName);
                 sb.Append(".");
                 sb.Append(sf.GetMethod().Name);
-                String s = sf.GetFileName();
+                var s = sf.GetFileName();
                 if (!String.IsNullOrEmpty(s))
                 {
                     sb.Append("(");

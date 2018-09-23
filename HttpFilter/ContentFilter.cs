@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using XProxy.Base;
@@ -8,21 +8,21 @@ using XProxy.Http;
 namespace HttpFilter
 {
     /// <summary>
-    /// ÄÚÈİ¹ıÂËÆ÷
+    /// å†…å®¹è¿‡æ»¤å™¨
     /// </summary>
     public class ContentFilter : HttpPluginBase
     {
         /// <summary>
-        /// ´¦ÀíÏìÓ¦ºóµÄÄÚÈİ¡£
-        /// ÏÖÔÚµÄÑÓ³Ù´¦Àí»¹Ã»ÓĞ×öºÃ£¬Èç¹û×öºÃÁËÑÓ³Ù´¦Àí£¬¾Í¿ÉÒÔÖ±½ÓOnResponseµÄÁíÒ»¸ö°æ±¾¡£
+        /// å¤„ç†å“åº”åçš„å†…å®¹ã€‚
+        /// ç°åœ¨çš„å»¶è¿Ÿå¤„ç†è¿˜æ²¡æœ‰åšå¥½ï¼Œå¦‚æœåšå¥½äº†å»¶è¿Ÿå¤„ç†ï¼Œå°±å¯ä»¥ç›´æ¥OnResponseçš„å¦ä¸€ä¸ªç‰ˆæœ¬ã€‚
         /// </summary>
         /// <param name="client"></param>
         /// <param name="Data"></param>
         /// <returns></returns>
-        public override byte[] OnResponseContent(Session client, byte[] Data)
+        public override Byte[] OnResponseContent(Session client, Byte[] Data)
         {
-            //Òª×¢Òâ±àÂë¡£²»Ò»¶¨ÊÇgb2312±àÂë¡£V1.0°æÖĞÓĞ×Ô¶¯Ê¶±ğ±àÂëµÄ¹¦ÄÜ£¬ÏÖÔÚ»¹Ã»ÓĞÇ¨ÒÆ¹ıÀ´¡£
-            String str = Encoding.Default.GetString(Data);
+            //è¦æ³¨æ„ç¼–ç ã€‚ä¸ä¸€å®šæ˜¯gb2312ç¼–ç ã€‚V1.0ç‰ˆä¸­æœ‰è‡ªåŠ¨è¯†åˆ«ç¼–ç çš„åŠŸèƒ½ï¼Œç°åœ¨è¿˜æ²¡æœ‰è¿ç§»è¿‡æ¥ã€‚
+            var str = Encoding.Default.GetString(Data);
             str = Regex.Replace(str, @"\w+\.baidu\.com",
                 Manager.Manager.Listener.Address.ToString() + ":" +
                 Manager.Manager.Listener.Config.Port.ToString());
@@ -33,9 +33,9 @@ namespace HttpFilter
         {
             get
             {
-				PluginConfig pc = base.DefaultConfig;
-                pc.Name = "ÄÚÈİ¹ıÂËÆ÷";
-                pc.Author = "´óÊ¯Í·";
+				var pc = base.DefaultConfig;
+                pc.Name = "å†…å®¹è¿‡æ»¤å™¨";
+                pc.Author = "å¤§çŸ³å¤´";
                 return pc;
             }
         }

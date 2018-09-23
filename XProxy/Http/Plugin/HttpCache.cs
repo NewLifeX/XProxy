@@ -22,25 +22,25 @@ namespace XProxy.Http.Plugin
 		/// <param name="session">客户端</param>
 		/// <param name="requestheader">请求头</param>
 		/// <returns>处理后的请求头</returns>
-		public override string OnRequestHeader(Session session, string requestheader)
+		public override String OnRequestHeader(Session session, String requestheader)
 		{
 			//判断是否存在过滤项
 			if (Include == null || Include.Length < 1) return requestheader;
 
 			//取得请求Url
-			Uri uri = HttpHelper.GetUriFromHeader(requestheader);
+			var uri = HttpHelper.GetUriFromHeader(requestheader);
 			if (uri == null) return requestheader;
 
 			//过滤检查
-			foreach (String item in Include)
+			foreach (var item in Include)
 			{
 				if (uri.OriginalString.Contains(item))
 				{
 					//检查例外
 					if (Exclude != null && Exclude.Length > 0)
 					{
-						Boolean isexclude = false;
-						foreach (String elm in Exclude)
+						var isexclude = false;
+						foreach (var elm in Exclude)
 						{
 							if (uri.OriginalString.Contains(elm))
 							{
@@ -70,7 +70,7 @@ namespace XProxy.Http.Plugin
 		{
 			get
 			{
-				PluginConfig pc = base.DefaultConfig;
+				var pc = base.DefaultConfig;
 				pc.Name = "Http缓存";
 				pc.Author = "大石头";
 				return pc;
@@ -114,9 +114,9 @@ namespace XProxy.Http.Plugin
 		/// <param name="uri"></param>
 		private void ProcessCache(Session session, Uri uri)
 		{
-			String path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "HttpCache");
+			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "HttpCache");
 			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-			String filename = uri.AbsolutePath;
+			var filename = uri.AbsolutePath;
 			filename = Path.Combine(path, filename);
 			filename = Path.GetFullPath(filename);
 
@@ -127,11 +127,11 @@ namespace XProxy.Http.Plugin
 				//没找到，下载
 				if (!Directory.Exists(Path.GetDirectoryName(filename))) 
 					Directory.CreateDirectory(Path.GetDirectoryName(filename));
-				WebClient wc = new WebClient();
+				var wc = new WebClient();
 				try
 				{
 					wc.DownloadFile(uri, filename);
-					String header = wc.ResponseHeaders.ToString();
+					var header = wc.ResponseHeaders.ToString();
 				}
 				catch (Exception ex)
 				{
@@ -141,7 +141,7 @@ namespace XProxy.Http.Plugin
 
 			//读取缓存
 			Byte[] bts;
-			using (FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
+			using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
 			{
 				fs.Position = 0;
 				bts = new Byte[fs.Length];
@@ -152,11 +152,11 @@ namespace XProxy.Http.Plugin
 
 		private void Write(Session session, Uri uri, Byte[] Data)
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 			sb.AppendLine("HTTP/1.1 200 OK");
 			sb.AppendFormat("Content-Length: {0}\r\n", Data.Length);
-			String ctype = ContentType.Other;
-			String ext = Path.GetExtension(uri.LocalPath).ToLower();
+			var ctype = ContentType.Other;
+			var ext = Path.GetExtension(uri.LocalPath).ToLower();
 			switch (ext)
 			{
 				case ".xml":

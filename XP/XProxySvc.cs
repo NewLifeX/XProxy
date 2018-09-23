@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.ServiceProcess;
-using System.Text;
-using XProxy.Config;
 using System.IO;
-using XProxy;
-using XProxy.Base;
+using System.ServiceProcess;
 using NewLife.Log;
+using XProxy.Base;
+using XProxy.Config;
 
 namespace XP
 {
     partial class XProxySvc : ServiceBase
     {
-        public XProxySvc()
-        {
-            InitializeComponent();
-        }
+        public XProxySvc() => InitializeComponent();
 
         private WriteLogDelegate _WriteLogEvent;
         /// <summary>
@@ -34,7 +26,7 @@ namespace XP
             set { _WriteLogEvent = value; }
         }
 
-        protected override void OnStart(string[] args)
+        protected override void OnStart(String[] args)
         {
             // TODO: 在此处添加代码以启动服务。
             XTrace.WriteLine("服务启动！");
@@ -60,20 +52,20 @@ namespace XP
         /// </summary>
         public void StartService()
         {
-            ProxyConfig config = LoadConfig();
+            var config = LoadConfig();
             if (config == null)
             {
                 XTrace.WriteLine("无法找到配置文件！");
                 return;
             }
 
-            foreach (ListenerConfig lc in config.Listeners)
+            foreach (var lc in config.Listeners)
             {
                 if (lc.Enable)
                 {
                     try
                     {
-                        Listener listener = new Listener(lc);
+                        var listener = new Listener(lc);
                         Listeners.Add(listener);
                         if (lc.IsShow) listener.OnWriteLog += WriteLogEvent;
                         listener.Start();
@@ -93,7 +85,7 @@ namespace XP
         {
             if (Listeners == null || Listeners.Count < 1) return;
 
-            foreach (Listener listener in Listeners)
+            foreach (var listener in Listeners)
             {
                 try
                 {
@@ -119,7 +111,7 @@ namespace XP
         {
             if (!File.Exists(ProxyConfig.DefaultFile)) return null;
 
-            ProxyConfig config = ProxyConfig.Instance;
+            var config = ProxyConfig.Instance;
             if (config == null || config.Listeners == null || config.Listeners.Length < 1) return null;
             //服务不会修改配置文件，所以不保存
             //config.IsSaved = true;
@@ -128,7 +120,7 @@ namespace XP
             if (watcher == null)
             {
                 watcher = new FileSystemWatcher();
-                String path = ProxyConfig.DefaultFile;
+                var path = ProxyConfig.DefaultFile;
                 watcher.Path = Path.GetDirectoryName(path);
                 watcher.Filter = Path.GetFileName(path);
                 watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
@@ -144,7 +136,7 @@ namespace XP
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void watcher_Changed(object sender, FileSystemEventArgs e)
+        void watcher_Changed(Object sender, FileSystemEventArgs e)
         {
             XTrace.WriteLine("配置文件被修改！重新加载配置！");
             StopService();

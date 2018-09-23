@@ -17,7 +17,7 @@ namespace XProxy.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>经过处理后的数据</returns>
-        public override byte[] OnClientToServer(Session session, byte[] Data)
+        public override Byte[] OnClientToServer(Session session, Byte[] Data)
         {
             return Encrypt(Data);
         }
@@ -28,7 +28,7 @@ namespace XProxy.Plugin
         /// <param name="session">客户端</param>
         /// <param name="Data">数据</param>
         /// <returns>经过处理后的数据</returns>
-        public override byte[] OnServerToClient(Session session, byte[] Data)
+        public override Byte[] OnServerToClient(Session session, Byte[] Data)
         {
             return Encrypt(Data);
         }
@@ -36,7 +36,7 @@ namespace XProxy.Plugin
         private Byte[] Encrypt(Byte[] Data)
         {
             if (Data == null || Data.Length < 1) return null;
-            for (int i = 0; i < Data.Length; i++)
+            for (var i = 0; i < Data.Length; i++)
             {
 				Data[i] ^= EncryptKey;
             }
@@ -50,7 +50,7 @@ namespace XProxy.Plugin
         {
             get
             {
-                PluginConfig pc = base.DefaultConfig;
+                var pc = base.DefaultConfig;
                 pc.Author = "大石头";
                 pc.Name = "加密插件";
                 return pc;
