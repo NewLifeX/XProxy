@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.ServiceProcess;
-using System.Collections;
-using XLog;
 using System.Diagnostics;
 using System.IO;
+using System.ServiceProcess;
+using System.Windows.Forms;
+using NewLife.Log;
 
 namespace XP
 {
@@ -30,7 +28,7 @@ namespace XP
                     }
                     catch (Exception ex)
                     {
-                        XLog.Trace.WriteLine(ex.ToString());
+                        XTrace.WriteLine(ex.ToString());
                         Console.WriteLine(ex.ToString());
                     }
                     return;

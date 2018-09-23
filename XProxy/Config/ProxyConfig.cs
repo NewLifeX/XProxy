@@ -1,26 +1,27 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 using System.IO;
+using NewLife.Log;
 
 namespace XProxy.Config
 {
     /// <summary>
-    /// ´úÀíÅäÖÃ
+    /// ä»£ç†é…ç½®
     /// </summary>
     [Serializable]
     public class ProxyConfig
     {
-        #region ÊôĞÔ
+        #region å±æ€§
         private ListenerConfig[] _Listeners;
         /// <summary>
-        /// ¼àÌıÆ÷¼¯ºÏ
+        /// ç›‘å¬å™¨é›†åˆ
         /// </summary>
         public ListenerConfig[] Listeners { get { return _Listeners; } set { _Listeners = value; } }
         #endregion
 
-        #region ¹¹Ôìº¯Êı
+        #region æ„é€ å‡½æ•°
         //public static List<ListenerConfig> list = new List<ListenerConfig>();
         //public ProxyConfig()
         //{
@@ -29,7 +30,7 @@ namespace XProxy.Config
 
         private static ProxyConfig _Instance;
         /// <summary>
-        /// Ä¬ÈÏÊµÀı
+        /// é»˜è®¤å®ä¾‹
         /// </summary>
         public static ProxyConfig Instance
         {
@@ -49,14 +50,14 @@ namespace XProxy.Config
         }
 
         ///// <summary>
-        ///// BindSourceÄ¬ÈÏ»á³õÊ¼»¯Ò»¸öConfigÀà£¬È»ºó²Åµ÷ÓÃGetList·½·¨¡£
-        ///// ËùÒÔ£¬Ó¦¸ÃÊÇÖ»ÓĞµ÷ÓÃÁËLoadµÄÄÇ¸ö·½·¨²ÅÄÜSave¡£
+        ///// BindSourceé»˜è®¤ä¼šåˆå§‹åŒ–ä¸€ä¸ªConfigç±»ï¼Œç„¶åæ‰è°ƒç”¨GetListæ–¹æ³•ã€‚
+        ///// æ‰€ä»¥ï¼Œåº”è¯¥æ˜¯åªæœ‰è°ƒç”¨äº†Loadçš„é‚£ä¸ªæ–¹æ³•æ‰èƒ½Saveã€‚
         ///// </summary>
         //[NonSerialized]
         //private bool IsSaved = true;
 
         /// <summary>
-        /// Îö¹¹Ê±±£´æ
+        /// ææ„æ—¶ä¿å­˜
         /// </summary>
         ~ProxyConfig()
         {
@@ -68,11 +69,11 @@ namespace XProxy.Config
         }
         #endregion
 
-        #region ¼ÓÔØ±£´æ
+        #region åŠ è½½ä¿å­˜
         /// <summary>
-        /// ¼ÓÔØ
+        /// åŠ è½½
         /// </summary>
-        /// <param name="filename">ÎÄ¼şÃû</param>
+        /// <param name="filename">æ–‡ä»¶å</param>
         /// <returns></returns>
 		public static ProxyConfig Load(String filename)
 		{
@@ -89,7 +90,7 @@ namespace XProxy.Config
 					}
 					catch (Exception ex)
 					{
-						XLog.Trace.WriteLine("¼ÓÔØ´úÀíÅäÖÃÎÄ¼ş" + filename + "Ê±·¢Éú´íÎó£¡\n" + ex.ToString());
+						XTrace.WriteLine("åŠ è½½ä»£ç†é…ç½®æ–‡ä»¶" + filename + "æ—¶å‘ç”Ÿé”™è¯¯ï¼\n" + ex.ToString());
 					}
 					sr.Close();
 				}
@@ -98,10 +99,10 @@ namespace XProxy.Config
 		}
 
         /// <summary>
-        /// ±£´æ
+        /// ä¿å­˜
         /// </summary>
-        /// <param name="filename">ÎÄ¼şÃû</param>
-        /// <param name="config">Òª±£´æµÄ¶ÔÏó</param>
+        /// <param name="filename">æ–‡ä»¶å</param>
+        /// <param name="config">è¦ä¿å­˜çš„å¯¹è±¡</param>
         public static void Save(String filename, ProxyConfig config)
         {
             if (config == null) return;
@@ -115,14 +116,14 @@ namespace XProxy.Config
                 }
 				catch (Exception ex)
 				{
-					XLog.Trace.WriteLine("±£´æ´úÀíÅäÖÃÎÄ¼ş" + filename + "Ê±·¢Éú´íÎó£¡\n" + ex.ToString());
+					XTrace.WriteLine("ä¿å­˜ä»£ç†é…ç½®æ–‡ä»¶" + filename + "æ—¶å‘ç”Ÿé”™è¯¯ï¼\n" + ex.ToString());
 				}
 				sw.Close();
             }
         }
 
         /// <summary>
-        /// Ä¬ÈÏÅäÖÃÎÄ¼ş
+        /// é»˜è®¤é…ç½®æ–‡ä»¶
         /// </summary>
         public static String DefaultFile
         {

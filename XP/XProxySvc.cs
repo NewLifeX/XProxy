@@ -9,6 +9,7 @@ using XProxy.Config;
 using System.IO;
 using XProxy;
 using XProxy.Base;
+using NewLife.Log;
 
 namespace XP
 {
@@ -27,7 +28,7 @@ namespace XP
         {
             get
             {
-                if (_WriteLogEvent == null) return new WriteLogDelegate(XLog.Trace.WriteLine);
+                if (_WriteLogEvent == null) return new WriteLogDelegate(XTrace.WriteLine);
                 return _WriteLogEvent;
             }
             set { _WriteLogEvent = value; }
@@ -36,7 +37,7 @@ namespace XP
         protected override void OnStart(string[] args)
         {
             // TODO: 在此处添加代码以启动服务。
-            XLog.Trace.WriteLine("服务启动！");
+            XTrace.WriteLine("服务启动！");
 
             StartService();
         }
@@ -44,7 +45,7 @@ namespace XP
         protected override void OnStop()
         {
             // TODO: 在此处添加代码以执行停止服务所需的关闭操作。
-            XLog.Trace.WriteLine("服务停止！");
+            XTrace.WriteLine("服务停止！");
 
             StopService();
         }
@@ -62,7 +63,7 @@ namespace XP
             ProxyConfig config = LoadConfig();
             if (config == null)
             {
-                XLog.Trace.WriteLine("无法找到配置文件！");
+                XTrace.WriteLine("无法找到配置文件！");
                 return;
             }
 
@@ -79,7 +80,7 @@ namespace XP
                     }
                     catch (Exception ex)
                     {
-                        XLog.Trace.WriteLine("启动[" + lc.Name + "]时出错！" + ex.ToString());
+                        XTrace.WriteLine("启动[" + lc.Name + "]时出错！" + ex.ToString());
                     }
                 }
             }
@@ -100,7 +101,7 @@ namespace XP
                 }
                 catch (Exception ex)
                 {
-                    XLog.Trace.WriteLine(ex.ToString());
+                    XTrace.WriteLine(ex.ToString());
                 }
             }
         }
@@ -133,7 +134,7 @@ namespace XP
                 watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
                 watcher.Changed += new FileSystemEventHandler(watcher_Changed);
                 watcher.EnableRaisingEvents = true;
-                //XLog.Trace.WriteLine("建立监视器！");
+                //XTrace.WriteLine("建立监视器！");
             }
             return config;
         }
@@ -145,7 +146,7 @@ namespace XP
         /// <param name="e"></param>
         void watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            XLog.Trace.WriteLine("配置文件被修改！重新加载配置！");
+            XTrace.WriteLine("配置文件被修改！重新加载配置！");
             StopService();
             StartService();
         }

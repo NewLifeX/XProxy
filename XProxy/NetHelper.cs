@@ -1,24 +1,25 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using NewLife.Log;
 
 namespace XProxy
 {
     /// <summary>
-    /// ÍøÂçÖúÊÖ
+    /// ç½‘ç»œåŠ©æ‰‹
     /// </summary>
     public static class NetHelper
     {
         /// <summary>
-        /// ÉèÖÃ³¬Ê±¼ì²âÊ±¼äºÍ¼ì²â¼ä¸ô
+        /// è®¾ç½®è¶…æ—¶æ£€æµ‹æ—¶é—´å’Œæ£€æµ‹é—´éš”
         /// </summary>
-        /// <param name="socket">ÒªÉèÖÃµÄSocket¶ÔÏó</param>
-        /// <param name="iskeepalive">ÊÇ·ñÆôÓÃKeep-Alive</param>
-        /// <param name="starttime">¶à³¤Ê±¼äºó¿ªÊ¼µÚÒ»´ÎÌ½²â£¨µ¥Î»£ººÁÃë£©</param>
-        /// <param name="interval">Ì½²âÊ±¼ä¼ä¸ô£¨µ¥Î»£ººÁÃë£©</param>
+        /// <param name="socket">è¦è®¾ç½®çš„Socketå¯¹è±¡</param>
+        /// <param name="iskeepalive">æ˜¯å¦å¯ç”¨Keep-Alive</param>
+        /// <param name="starttime">å¤šé•¿æ—¶é—´åå¼€å§‹ç¬¬ä¸€æ¬¡æ¢æµ‹ï¼ˆå•ä½ï¼šæ¯«ç§’ï¼‰</param>
+        /// <param name="interval">æ¢æµ‹æ—¶é—´é—´éš”ï¼ˆå•ä½ï¼šæ¯«ç§’ï¼‰</param>
         public static void SetKeepAlive(Socket socket,Boolean iskeepalive, Int32 starttime, Int32 interval)
         {
             uint dummy = 0;
@@ -30,13 +31,13 @@ namespace XProxy
         }
         //struct tcp_keepalive
         //{
-        //    u_long onoff; //ÊÇ·ñÆôÓÃKeep-Alive
-        //    u_long keepalivetime; //¶à³¤Ê±¼äºó¿ªÊ¼µÚÒ»´ÎÌ½²â£¨µ¥Î»£ººÁÃë£©
-        //    u_long keepaliveinterval; //Ì½²âÊ±¼ä¼ä¸ô£¨µ¥Î»£ººÁÃë£©
+        //    u_long onoff; //æ˜¯å¦å¯ç”¨Keep-Alive
+        //    u_long keepalivetime; //å¤šé•¿æ—¶é—´åå¼€å§‹ç¬¬ä¸€æ¬¡æ¢æµ‹ï¼ˆå•ä½ï¼šæ¯«ç§’ï¼‰
+        //    u_long keepaliveinterval; //æ¢æµ‹æ—¶é—´é—´éš”ï¼ˆå•ä½ï¼šæ¯«ç§’ï¼‰
         //};
 
         /// <summary>
-        /// Êä³ö¶ÑÕ»
+        /// è¾“å‡ºå †æ ˆ
         /// </summary>
         public static void OutStack()
         {
@@ -55,11 +56,11 @@ namespace XProxy
                     sb.Append(s);
                     sb.Append(",");
                     sb.Append(sf.GetFileLineNumber().ToString());
-                    sb.Append("ĞĞ)");
+                    sb.Append("è¡Œ)");
                 }
                 sb.Append(Environment.NewLine);
             }
-            XLog.Trace.WriteLine(sb.ToString());
+            XTrace.WriteLine(sb.ToString());
         }
     }
 }

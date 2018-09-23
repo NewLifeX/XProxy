@@ -1,25 +1,22 @@
-using System;
+ï»¿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Collections;
-using System.Text;
-using System.Collections.Generic;
-
-using XLog;
-using XProxy.Plugin;
+using NewLife.Log;
 using XProxy.Config;
+using XProxy.Plugin;
 
 namespace XProxy.Base
 {
     /// <summary>
-    /// ´úÀí¼àÌıÆ÷Àà
+    /// ä»£ç†ç›‘å¬å™¨ç±»
     /// </summary>
     public class Listener : IDisposable
     {
-        #region ÊôĞÔ
+        #region å±æ€§
         private IPAddress _Address;
         /// <summary>
-        /// µØÖ·
+        /// åœ°å€
         /// </summary>
         public IPAddress Address
         {
@@ -38,9 +35,9 @@ namespace XProxy.Base
                     catch (Exception ex)
                     {
                         Dispose();
-                        String msg = "»ñÈ¡[" + Config.Address + "]µÄIPµØÖ·Ê±³ö´í£¡";
+                        String msg = "è·å–[" + Config.Address + "]çš„IPåœ°å€æ—¶å‡ºé”™ï¼";
                         WriteLog(msg);
-                        XLog.Trace.WriteLine(msg);
+                        XTrace.WriteLine(msg);
                         throw ex;
                     }
                 }
@@ -50,7 +47,7 @@ namespace XProxy.Base
 
         private TcpListener _TcpServer;
         /// <summary>
-        /// Tcp¼àÌıÆ÷
+        /// Tcpç›‘å¬å™¨
         /// </summary>
         public TcpListener TcpServer
         {
@@ -59,25 +56,25 @@ namespace XProxy.Base
         }
 
         /// <summary>
-        /// ¿Í»§¶ËÊı×é¡£ÓÃÀ´¼ÇÂ¼ËùÓĞÒÑÁ¬½Ó¿Í»§¶Ë¡£
+        /// å®¢æˆ·ç«¯æ•°ç»„ã€‚ç”¨æ¥è®°å½•æ‰€æœ‰å·²è¿æ¥å®¢æˆ·ç«¯ã€‚
         /// </summary>
         public List<Session> Clients = new List<Session>();
 
         /// <summary>
-        /// Ğ´ÈÕÖ¾Î¯ÍĞ
+        /// å†™æ—¥å¿—å§”æ‰˜
         /// </summary>
         public event WriteLogDelegate OnWriteLog;
 
         private PluginManager _Plugin;
         /// <summary>
-        /// ²å¼ş¹ÜÀíÆ÷
+        /// æ’ä»¶ç®¡ç†å™¨
         /// </summary>
         internal PluginManager Plugin
         { get { return _Plugin; } set { _Plugin = value; } }
 
         private ListenerConfig _Config;
         /// <summary>
-        /// ÅäÖÃ
+        /// é…ç½®
         /// </summary>
         public ListenerConfig Config
         {
@@ -96,9 +93,9 @@ namespace XProxy.Base
         }
         #endregion
 
-        #region ¹¹Ôìº¯Êı
+        #region æ„é€ å‡½æ•°
         /// <summary>
-        /// ³õÊ¼»¯¼àÌıÆ÷ÀàµÄĞÂÊµÀı
+        /// åˆå§‹åŒ–ç›‘å¬å™¨ç±»çš„æ–°å®ä¾‹
         /// </summary>
         /// <param name="config"></param>
         public Listener(ListenerConfig config)
@@ -107,9 +104,9 @@ namespace XProxy.Base
         }
         #endregion
 
-        #region ¿ªÊ¼/Í£Ö¹
+        #region å¼€å§‹/åœæ­¢
         /// <summary>
-        /// ÔÚÖ¸¶¨µÄIPºÍ¶Ë¿ÚÉÏ¿ªÊ¼¼àÌı
+        /// åœ¨æŒ‡å®šçš„IPå’Œç«¯å£ä¸Šå¼€å§‹ç›‘å¬
         /// </summary>
         public virtual void Start()
         {
@@ -124,14 +121,14 @@ namespace XProxy.Base
             try
             {
                 int plugincount = Plugin.Plugins == null ? 0 : Plugin.Plugins.Count;
-                WriteLog(String.Format("¿ªÊ¼¼àÌı {0}:{1} [{2}] ²å¼ş£º{3}¸ö", Address.ToString(), Config.Port, Config.Name, plugincount));
+                WriteLog(String.Format("å¼€å§‹ç›‘å¬ {0}:{1} [{2}] æ’ä»¶ï¼š{3}ä¸ª", Address.ToString(), Config.Port, Config.Name, plugincount));
                 if (TcpServer != null) Stop();
                 TcpServer = new TcpListener(Address, Config.Port);
-                // Ö¸¶¨ TcpListener ÊÇ·ñÖ»ÔÊĞíÒ»¸ö»ù´¡Ì×½Ó×ÖÀ´ÕìÌıÌØ¶¨¶Ë¿Ú¡£
-                // Ö»ÓĞ¼àÌıÈÎÒâIPµÄÊ±ºò£¬²Å´ò¿ª ExclusiveAddressUse
+                // æŒ‡å®š TcpListener æ˜¯å¦åªå…è®¸ä¸€ä¸ªåŸºç¡€å¥—æ¥å­—æ¥ä¾¦å¬ç‰¹å®šç«¯å£ã€‚
+                // åªæœ‰ç›‘å¬ä»»æ„IPçš„æ—¶å€™ï¼Œæ‰æ‰“å¼€ ExclusiveAddressUse
                 TcpServer.ExclusiveAddressUse = (Address == IPAddress.Any);
                 TcpServer.Start();
-                // ¿ªÊ¼Òì²½½ÓÊÜ´«ÈëµÄÁ¬½Ó
+                // å¼€å§‹å¼‚æ­¥æ¥å—ä¼ å…¥çš„è¿æ¥
                 TcpServer.BeginAcceptTcpClient(new AsyncCallback(this.OnAccept), TcpServer);
                 IsDisposed = false;
                 Plugin.OnListenerStart(this);
@@ -139,22 +136,22 @@ namespace XProxy.Base
             catch (Exception ex)
             {
                 Dispose();
-                String msg = "¿ªÊ¼¼àÌı" + Address.ToString() + ":" + Config.Port + "Ê±³ö´í£¡" + ex.Message;
+                String msg = "å¼€å§‹ç›‘å¬" + Address.ToString() + ":" + Config.Port + "æ—¶å‡ºé”™ï¼" + ex.Message;
                 WriteLog(msg);
-                XLog.Trace.WriteLine(msg);
+                XTrace.WriteLine(msg);
                 throw ex;
             }
         }
 
         /// <summary>
-        /// Í£Ö¹¼àÌı
+        /// åœæ­¢ç›‘å¬
         /// </summary>
         public virtual void Stop()
         {
-            WriteLog("Í£Ö¹¼àÌı" + Address.ToString() + ":" + Config.Port);
+            WriteLog("åœæ­¢ç›‘å¬" + Address.ToString() + ":" + Config.Port);
             if (Clients != null)
             {
-                // DisposeÊ±»á¹Ø±ÕÃ¿¸ö¿Í»§¶ËµÄÁ¬½Ó
+                // Disposeæ—¶ä¼šå…³é—­æ¯ä¸ªå®¢æˆ·ç«¯çš„è¿æ¥
                 for (int i = Clients.Count - 1; i >= 0; i--)
                     (Clients[i] as Session).Dispose();
                 Clients.Clear();
@@ -173,20 +170,20 @@ namespace XProxy.Base
             }
             catch (Exception ex)
             {
-                String msg = "Í£Ö¹¼àÌı" + Address.ToString() + ":" + Config.Port + "Ê±³ö´í£¡" + ex.Message;
+                String msg = "åœæ­¢ç›‘å¬" + Address.ToString() + ":" + Config.Port + "æ—¶å‡ºé”™ï¼" + ex.Message;
                 WriteLog(msg);
-                XLog.Trace.WriteLine(msg);
+                XTrace.WriteLine(msg);
                 throw ex;
             }
         }
         #endregion
 
-        #region ĞÂ¿Í»§¶Ëµ½À´
+        #region æ–°å®¢æˆ·ç«¯åˆ°æ¥
         ///<summary>
-        /// µ±¿Í»§Á´½ÓµÈ´ı´«ÈëÊ±±»µ÷ÓÃ¡£
-        /// ¹Ø±Õ¼àÌıÆ÷Ê±£¬Ò²±»µ÷ÓÃ£¬Ö»²»¹ıEndAcceptTcpClient»á´¥·¢Òì³£
+        /// å½“å®¢æˆ·é“¾æ¥ç­‰å¾…ä¼ å…¥æ—¶è¢«è°ƒç”¨ã€‚
+        /// å…³é—­ç›‘å¬å™¨æ—¶ï¼Œä¹Ÿè¢«è°ƒç”¨ï¼Œåªä¸è¿‡EndAcceptTcpClientä¼šè§¦å‘å¼‚å¸¸
         /// </summary>
-        ///<param name="ar">Òì²½²Ù×÷µÄ½á¹û</param>
+        ///<param name="ar">å¼‚æ­¥æ“ä½œçš„ç»“æœ</param>
         private void OnAccept(IAsyncResult ar)
         {
             TcpClient tcp = null;
@@ -197,7 +194,7 @@ namespace XProxy.Base
             catch { return; }
             try
             {
-                // ÏÈÖØĞÂ¿ªÊ¼¼àÌı£¬²»Òªµ¢ÎóÁË±ğµÄÀ´·ÃÕß·ÃÎÊ
+                // å…ˆé‡æ–°å¼€å§‹ç›‘å¬ï¼Œä¸è¦è€½è¯¯äº†åˆ«çš„æ¥è®¿è€…è®¿é—®
                 TcpServer.BeginAcceptTcpClient(new AsyncCallback(this.OnAccept), TcpServer);
             }
             catch { Dispose(); }
@@ -210,45 +207,45 @@ namespace XProxy.Base
                     if (Config.IsShow && OnWriteLog != null) NewClient.OnWriteLog += new WriteLogDelegate(WriteLog);
                     NewClient.OnDestroy += new DestroyDelegate(ClientDestroy);
                     NewClient.Listener = this;
-                    NewClient.WriteLog("ĞÂ¿Í»§ (" + tcp.Client.RemoteEndPoint.ToString() + ")");
+                    NewClient.WriteLog("æ–°å®¢æˆ· (" + tcp.Client.RemoteEndPoint.ToString() + ")");
                     Clients.Add(NewClient);
                     NewClient.Start();
                 }
             }
             catch (Exception ex)
             {
-                Trace.WriteLine("¼àÌıÆ÷½ÓÊÜÁ¬½ÓÊ±³ö´í£¡ " + ex.Message);
+                XTrace.WriteLine("ç›‘å¬å™¨æ¥å—è¿æ¥æ—¶å‡ºé”™ï¼ " + ex.Message);
             }
         }
 
         private Boolean ClientDestroy(Session session)
         {
-            session.WriteLog("¿Í»§(" + session.IPAndPort + ")" + "ÍË³ö");
-            //WriteLog("¿Í»§" + session.GUID + "(" + session.IPAndPort + ")" + "ÍË³ö");
+            session.WriteLog("å®¢æˆ·(" + session.IPAndPort + ")" + "é€€å‡º");
+            //WriteLog("å®¢æˆ·" + session.GUID + "(" + session.IPAndPort + ")" + "é€€å‡º");
             //GC.Collect();
             return Clients.Remove(session);
         }
 
         /// <summary>
-        /// ĞÂ¿Í»§¶ËÁ¬½Ó¡£ÇëÍ¨¹ı¸Ã·½·¨½¨Á¢ÏàÓ¦µÄ¿Í»§¶ËÊµÀı¶ÔÏó¡£
-        /// ±ÈÈç£ºreturn new HttpClient(session, ServerPort, ServerAddress);
+        /// æ–°å®¢æˆ·ç«¯è¿æ¥ã€‚è¯·é€šè¿‡è¯¥æ–¹æ³•å»ºç«‹ç›¸åº”çš„å®¢æˆ·ç«¯å®ä¾‹å¯¹è±¡ã€‚
+        /// æ¯”å¦‚ï¼šreturn new HttpClient(session, ServerPort, ServerAddress);
         /// </summary>
-        /// <param name="tcp">¶ÔÓ¦µÄTcpClient</param>
-        /// <returns>¿Í»§¶ËÊµÀı</returns>
+        /// <param name="tcp">å¯¹åº”çš„TcpClient</param>
+        /// <returns>å®¢æˆ·ç«¯å®ä¾‹</returns>
         public virtual Session OnAccept(TcpClient tcp)
         {
             return new Session(tcp, Config.ServerPort, Config.ServerAddress);
         }
         #endregion
 
-        #region ×ÊÔ´Ïú»Ù
+        #region èµ„æºé”€æ¯
         /// <summary>
-        /// ÊÇ·ñÒÑ¾­Ïú»Ù
+        /// æ˜¯å¦å·²ç»é”€æ¯
         /// </summary>
         private bool IsDisposed = false;
 
-        ///<summary>Ïú»Ù¼àÌıÆ÷Õ¼ÓÃµÄ×ÊÔ´</summary>
-        ///<remarks>Í£Ö¹¼àÌı£¬²¢Ïú»Ù <em>ËùÓĞ</em> ¿Í»§¶ÔÏó£¬Ò»µ©Ïú»Ù£¬¶ÔÏó½«²»ÔÙÊ¹ÓÃ</remarks>
+        ///<summary>é”€æ¯ç›‘å¬å™¨å ç”¨çš„èµ„æº</summary>
+        ///<remarks>åœæ­¢ç›‘å¬ï¼Œå¹¶é”€æ¯ <em>æ‰€æœ‰</em> å®¢æˆ·å¯¹è±¡ï¼Œä¸€æ—¦é”€æ¯ï¼Œå¯¹è±¡å°†ä¸å†ä½¿ç”¨</remarks>
         ///<seealso cref ="System.IDisposable"/>
         public void Dispose()
         {
@@ -261,19 +258,19 @@ namespace XProxy.Base
                 //GC.Collect();
             }
         }
-        ///<summary>ÖÕÖ¹¼àÌıÆ÷</summary>
-        ///<remarks>µ÷ÓÃDisposeµÄÎö¹¹º¯Êı</remarks>
+        ///<summary>ç»ˆæ­¢ç›‘å¬å™¨</summary>
+        ///<remarks>è°ƒç”¨Disposeçš„ææ„å‡½æ•°</remarks>
         ~Listener()
         {
             Dispose();
         }
         #endregion
 
-        #region ÈÕÖ¾
+        #region æ—¥å¿—
         /// <summary>
-        /// Ğ´ÈÕÖ¾
+        /// å†™æ—¥å¿—
         /// </summary>
-        /// <param name="msg">ÈÕÖ¾</param>
+        /// <param name="msg">æ—¥å¿—</param>
         public void WriteLog(String msg)
         {
             if (Config.IsShow && OnWriteLog != null)
