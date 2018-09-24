@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过下列属性集
 // 控制。更改这些属性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("XProxy代理核心")]
-[assembly: AssemblyDescription("各种代理的核心组件")]
+[assembly: AssemblyTitle("XProxy代理库")]
+[assembly: AssemblyDescription("反向代理")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("新生命开发团队（http://www.nnhy.org）")]
+[assembly: AssemblyCompany("新生命开发团队")]
 [assembly: AssemblyProduct("XProxy")]
-[assembly: AssemblyCopyright("版权所有 (C) NewLife 2008")]
+[assembly: AssemblyCopyright("版权所有 (C) 新生命开发团队 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,11 @@ using System.Runtime.InteropServices;
 // 可以指定所有这些值，也可以使用“内部版本号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.*")]
-[assembly: AssemblyFileVersion("1.1.2008.0307")]
+[assembly: AssemblyVersion("2.0.*")]
+[assembly: AssemblyFileVersion("2.0.2018.0924")]
+
+/*
+ * v2.0.2018.0924   使用第三代网络库重构反向代理
+ * v1.1.2008.0307   完善配置管理界面
+ * v1.0.2005.0101   建立代理服务器
+ */

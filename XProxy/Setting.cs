@@ -35,6 +35,8 @@ namespace XProxy
                 var ms = Items;
                 if (ms != null && ms.Length > 0) list.AddRange(ms);
 
+                var demo = list.Count == 0;
+
                 var arr = ProxyHelper.GetAll();
                 foreach (var item in arr)
                 {
@@ -65,6 +67,9 @@ namespace XProxy
                                 pi.Local = "tcp://0.0.0.0:1080";
                                 pi.Remote = "";
                             }
+
+                            // 演示模式时，默认开启所有代理
+                            if (demo) pi.Enable = true;
 
                             list.Add(pi);
                         }
