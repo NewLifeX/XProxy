@@ -10,3 +10,12 @@ XProxy是一个代理服务器宿主环境，可用于寄宿多种`ProxyBase`服
 
 XProxy支持单服务同时寄宿多个代理服务，配置文件的Items下，每一行ProxyItem代表一个代理服务。  
 以管理员运行`XProxy.exe`，可以选择把它安装成为Windows服务，并控制它的启动和停止。  
+
+## 新生命开发团队
+本应用作为[新生命开发团队](https://github.com/NewLifeX)2018年开源路线图的一部分，依赖库：
++ [X组件](https://github.com/NewLifeX/X)  
++ [NewLife.Net网络库](https://github.com/NewLifeX/NewLife.Net)  
+
+
+QQ群：1600800  
+博客：https://nnhy.cnblogs.com  
