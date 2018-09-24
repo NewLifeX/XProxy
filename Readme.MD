@@ -6,7 +6,7 @@ XProxy是一个代理服务器宿主环境，可用于寄宿多种`ProxyBase`服
 
 ## 使用说明
 双击启动`XProxy.exe`，自动生成配置文件`Config\XProxy.config`，默认如下：
-[Demo](Doc\Demo.png)
+![Demo](Doc/Demo.png)
 
 XProxy支持单服务同时寄宿多个代理服务，配置文件的Items下，每一行ProxyItem代表一个代理服务。  
 以管理员运行`XProxy.exe`，可以选择把它安装成为Windows服务，并控制它的启动和停止。  
