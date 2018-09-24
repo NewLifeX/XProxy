@@ -34,17 +34,10 @@ namespace XProxy.Base
         /// 缓存数据
         /// </summary>
         private Byte[] Buffer = new Byte[1024 * 8];
-
-        private Encoding _Encode;
         /// <summary>
         /// 编码
         /// </summary>
-        public Encoding Encode
-        {
-            get { return _Encode; }
-            set { _Encode = value; }
-
-        }
+        public Encoding Encode { get; set; }
 
         private String _Name;
         /// <summary>
@@ -55,18 +48,10 @@ namespace XProxy.Base
             get { return _Name; }
             set { _Name = value; }
         }
-        #endregion
-
-        #region 引用属性
-        private Session _Session;
         /// <summary>
         /// 会话
         /// </summary>
-        public Session Session
-        {
-            get { return _Session; }
-            set { _Session = value; }
-        }
+        public Session Session { get; set; }
         #endregion
 
         #region 便捷属性

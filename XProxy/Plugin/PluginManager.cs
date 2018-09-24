@@ -1,340 +1,336 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using XProxy.Config;
-using System.Reflection;
 using System.IO;
-using XProxy.Http;
+using System.Reflection;
 using XProxy.Base;
+using XProxy.Config;
+using XProxy.Http;
 
 namespace XProxy.Plugin
 {
-	/// <summary>
-	/// ²å¼ş¹ÜÀíÀà
-	/// </summary>
-	public class PluginManager
-	{
-		#region ÊôĞÔ
-		private IList<IPlugin> _Plugins;
-		/// <summary>
-		/// ²å¼ş¼¯ºÏ¡£´¦Àí¸÷ÊÂ¼şµÄÊ±ºò£¬½«°´ÕÕÏÈºóË³Ğòµ÷ÓÃ²å¼şµÄ´¦Àí·½·¨¡£
-		/// </summary>
-		public IList<IPlugin> Plugins { get { return _Plugins; } set { _Plugins = value; } }
+    /// <summary>
+    /// æ’ä»¶ç®¡ç†ç±»
+    /// </summary>
+    public class PluginManager
+    {
+        #region å±æ€§
+        /// <summary>
+        /// æ’ä»¶é›†åˆã€‚å¤„ç†å„äº‹ä»¶çš„æ—¶å€™ï¼Œå°†æŒ‰ç…§å…ˆåé¡ºåºè°ƒç”¨æ’ä»¶çš„å¤„ç†æ–¹æ³•ã€‚
+        /// </summary>
+        public IList<IPlugin> Plugins { get; set; }
 
-		private Listener _Listener;
-		/// <summary>
-		/// µ±Ç°¼àÌıÆ÷
-		/// </summary>
-		public Listener Listener { get { return _Listener; } set { _Listener = value; } }
+        /// <summary>
+        /// å½“å‰ç›‘å¬å™¨
+        /// </summary>
+        public Listener Listener { get; set; }
 
-		/// <summary>
-		/// Ğ´ÈÕÖ¾ÊÂ¼ş
-		/// </summary>
-		public event WriteLogDelegate OnWriteLog;
-		#endregion
+        /// <summary>
+        /// å†™æ—¥å¿—äº‹ä»¶
+        /// </summary>
+        public event WriteLogDelegate OnWriteLog;
+        #endregion
 
-		#region ¼ÓÔØ²å¼ş
-		/// <summary>
-		/// ¼ÓÔØ²å¼ş
-		/// </summary>
-		/// <param name="configs"></param>
-		private void LoadPlugin(IList<PluginConfig> configs)
-		{
-			if (configs == null || configs.Count < 1) return;
-			var list = new List<IPlugin>();
-			foreach (var config in configs)
-			{
-				if (!String.IsNullOrEmpty(config.ClassName))
-				{
-					Assembly asm;
-					if (String.IsNullOrEmpty(config.Path))
-						asm = Assembly.GetExecutingAssembly();
-					else
-					{
-						var path = config.Path;
-						if (!Path.IsPathRooted(path)) path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
-						try
-						{
-							asm = Assembly.LoadFile(path);
-						}
-						catch (Exception ex)
-						{
-							WriteLog(String.Format("¼ÓÔØ²å¼ş³ö´í£º{0}\n{1}", config, ex.ToString()));
-							continue;
-						}
-					}
-					if (asm != null)
-					{
-						var t = asm.GetType(config.ClassName, false);
-						if (t == null)
-						{
-							var ts = asm.GetTypes();
-							foreach (var tt in ts)
-							{
-								if (tt.Name.Contains(config.ClassName))
-								{
-									t = tt;
-									break;
-								}
-							}
-						}
-						if (t != null)
-						{
-							var obj = Activator.CreateInstance(t);
-							if (obj != null)
-							{
-								var p = obj as IPlugin;
-								if (p != null)
-								{
-									p.Config = config;
-									list.Add(p);
-									WriteLog(String.Format("¼ÓÔØ²å¼ş£º{0}", config));
-								}
-							}
-						}
-					}
-				}
-			}
-			Plugins = list;
-		}
-		#endregion
+        #region åŠ è½½æ’ä»¶
+        /// <summary>
+        /// åŠ è½½æ’ä»¶
+        /// </summary>
+        /// <param name="configs"></param>
+        private void LoadPlugin(IList<PluginConfig> configs)
+        {
+            if (configs == null || configs.Count < 1) return;
+            var list = new List<IPlugin>();
+            foreach (var config in configs)
+            {
+                if (!String.IsNullOrEmpty(config.ClassName))
+                {
+                    Assembly asm;
+                    if (String.IsNullOrEmpty(config.Path))
+                        asm = Assembly.GetExecutingAssembly();
+                    else
+                    {
+                        var path = config.Path;
+                        if (!Path.IsPathRooted(path)) path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
+                        try
+                        {
+                            asm = Assembly.LoadFile(path);
+                        }
+                        catch (Exception ex)
+                        {
+                            WriteLog(String.Format("åŠ è½½æ’ä»¶å‡ºé”™ï¼š{0}\n{1}", config, ex.ToString()));
+                            continue;
+                        }
+                    }
+                    if (asm != null)
+                    {
+                        var t = asm.GetType(config.ClassName, false);
+                        if (t == null)
+                        {
+                            var ts = asm.GetTypes();
+                            foreach (var tt in ts)
+                            {
+                                if (tt.Name.Contains(config.ClassName))
+                                {
+                                    t = tt;
+                                    break;
+                                }
+                            }
+                        }
+                        if (t != null)
+                        {
+                            var obj = Activator.CreateInstance(t);
+                            if (obj != null)
+                            {
+                                var p = obj as IPlugin;
+                                if (p != null)
+                                {
+                                    p.Config = config;
+                                    list.Add(p);
+                                    WriteLog(String.Format("åŠ è½½æ’ä»¶ï¼š{0}", config));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Plugins = list;
+        }
+        #endregion
 
-		#region ÊÂ¼ş
-		/// <summary>
-		/// ³õÊ¼»¯
-		/// </summary>
-		/// <param name="listener">¼àÌıÆ÷</param>
-		public void OnInit(Listener listener)
-		{
-			LoadPlugin(listener.Config.Plugins);
-			if (Plugins == null || Plugins.Count < 1) return;
+        #region äº‹ä»¶
+        /// <summary>
+        /// åˆå§‹åŒ–
+        /// </summary>
+        /// <param name="listener">ç›‘å¬å™¨</param>
+        public void OnInit(Listener listener)
+        {
+            LoadPlugin(listener.Config.Plugins);
+            if (Plugins == null || Plugins.Count < 1) return;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				Plugins[i].OnWriteLog += new WriteLogDelegate(WriteLog);
-				Plugins[i].OnInit(this);
-			}
-		}
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                Plugins[i].OnWriteLog += new WriteLogDelegate(WriteLog);
+                Plugins[i].OnInit(this);
+            }
+        }
 
-		/// <summary>
-		/// ÊÍ·Å×ÊÔ´
-		/// </summary>
-		public void OnDispose()
-		{
-			if (Plugins == null || Plugins.Count < 1) return;
+        /// <summary>
+        /// é‡Šæ”¾èµ„æº
+        /// </summary>
+        public void OnDispose()
+        {
+            if (Plugins == null || Plugins.Count < 1) return;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				Plugins[i].Dispose();
-			}
-		}
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                Plugins[i].Dispose();
+            }
+        }
 
-		/// <summary>
-		/// ¿ªÊ¼¼àÌı
-		/// </summary>
-		/// <param name="listener">¼àÌıÆ÷</param>
-		public void OnListenerStart(Listener listener)
-		{
-			if (Plugins == null || Plugins.Count < 1) return;
+        /// <summary>
+        /// å¼€å§‹ç›‘å¬
+        /// </summary>
+        /// <param name="listener">ç›‘å¬å™¨</param>
+        public void OnListenerStart(Listener listener)
+        {
+            if (Plugins == null || Plugins.Count < 1) return;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				Plugins[i].OnListenerStart(listener);
-			}
-		}
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                Plugins[i].OnListenerStart(listener);
+            }
+        }
 
-		/// <summary>
-		/// Í£Ö¹¼àÌı
-		/// </summary>
-		/// <param name="listener">¼àÌıÆ÷</param>
-		public void OnListenerStop(Listener listener)
-		{
-			if (Plugins == null || Plugins.Count < 1) return;
+        /// <summary>
+        /// åœæ­¢ç›‘å¬
+        /// </summary>
+        /// <param name="listener">ç›‘å¬å™¨</param>
+        public void OnListenerStop(Listener listener)
+        {
+            if (Plugins == null || Plugins.Count < 1) return;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				Plugins[i].OnListenerStop(listener);
-			}
-		}
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                Plugins[i].OnListenerStop(listener);
+            }
+        }
 
-		/// <summary>
-		/// µÚÒ»´ÎÏò¿Í»§¶Ë·¢Êı¾İÊ±´¥·¢¡£
-		/// </summary>
-		/// <param name="session">¿Í»§¶Ë</param>
-		/// <returns>ÊÇ·ñÔÊĞíÍ¨ĞĞ</returns>
-		public Boolean OnClientStart(Session session)
-		{
-			if (Plugins == null || Plugins.Count < 1) return true;
+        /// <summary>
+        /// ç¬¬ä¸€æ¬¡å‘å®¢æˆ·ç«¯å‘æ•°æ®æ—¶è§¦å‘ã€‚
+        /// </summary>
+        /// <param name="session">å®¢æˆ·ç«¯</param>
+        /// <returns>æ˜¯å¦å…è®¸é€šè¡Œ</returns>
+        public Boolean OnClientStart(Session session)
+        {
+            if (Plugins == null || Plugins.Count < 1) return true;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				if (!Plugins[i].OnClientStart(session)) return false;
-			}
-			return true;
-		}
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                if (!Plugins[i].OnClientStart(session)) return false;
+            }
+            return true;
+        }
 
-		/// <summary>
-		/// Á¬½ÓÔ¶³Ì·şÎñÆ÷Ê±´¥·¢¡£
-		/// </summary>
-		/// <param name="session">¿Í»§¶Ë</param>
-		/// <returns>ÊÇ·ñÔÊĞíÍ¨ĞĞ</returns>
-		public Boolean OnServerStart(Session session)
-		{
-			if (Plugins == null || Plugins.Count < 1) return true;
+        /// <summary>
+        /// è¿æ¥è¿œç¨‹æœåŠ¡å™¨æ—¶è§¦å‘ã€‚
+        /// </summary>
+        /// <param name="session">å®¢æˆ·ç«¯</param>
+        /// <returns>æ˜¯å¦å…è®¸é€šè¡Œ</returns>
+        public Boolean OnServerStart(Session session)
+        {
+            if (Plugins == null || Plugins.Count < 1) return true;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				if (!Plugins[i].OnServerStart(session)) return false;
-			}
-			return true;
-		}
-		#endregion
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                if (!Plugins[i].OnServerStart(session)) return false;
+            }
+            return true;
+        }
+        #endregion
 
-		#region Êı¾İ½»»»ÊÂ¼ş
-		/// <summary>
-		/// ¿Í»§¶ËÏò·şÎñÆ÷·¢Êı¾İÊ±´¥·¢¡£
-		/// </summary>
-		/// <param name="session">¿Í»§¶Ë</param>
-		/// <param name="Data">Êı¾İ</param>
-		/// <returns>¾­¹ı´¦ÀíºóData²ÎÊıÖĞµÄÊı¾İ´óĞ¡</returns>
-		public Byte[] OnClientToServer(Session session, Byte[] Data)
-		{
-			if (Plugins == null || Plugins.Count < 1) return Data;
-			if (Data == null || Data.Length < 1) return null;
+        #region æ•°æ®äº¤æ¢äº‹ä»¶
+        /// <summary>
+        /// å®¢æˆ·ç«¯å‘æœåŠ¡å™¨å‘æ•°æ®æ—¶è§¦å‘ã€‚
+        /// </summary>
+        /// <param name="session">å®¢æˆ·ç«¯</param>
+        /// <param name="Data">æ•°æ®</param>
+        /// <returns>ç»è¿‡å¤„ç†åDataå‚æ•°ä¸­çš„æ•°æ®å¤§å°</returns>
+        public Byte[] OnClientToServer(Session session, Byte[] Data)
+        {
+            if (Plugins == null || Plugins.Count < 1) return Data;
+            if (Data == null || Data.Length < 1) return null;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				Data = Plugins[i].OnClientToServer(session, Data);
-				if (Data == null || Data.Length < 1) return null;
-			}
-			return Data;
-		}
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                Data = Plugins[i].OnClientToServer(session, Data);
+                if (Data == null || Data.Length < 1) return null;
+            }
+            return Data;
+        }
 
-		/// <summary>
-		/// ·şÎñÆ÷Ïà¿Í»§¶Ë·¢Êı¾İÊ±´¥·¢¡£
-		/// </summary>
-		/// <param name="session">¿Í»§¶Ë</param>
-		/// <param name="Data">Êı¾İ</param>
-		/// <returns>¾­¹ı´¦ÀíºóData²ÎÊıÖĞµÄÊı¾İ´óĞ¡</returns>
-		public Byte[] OnServerToClient(Session session, Byte[] Data)
-		{
-			if (Plugins == null || Plugins.Count < 1) return Data;
-			if (Data == null || Data.Length < 1) return null;
+        /// <summary>
+        /// æœåŠ¡å™¨ç›¸å®¢æˆ·ç«¯å‘æ•°æ®æ—¶è§¦å‘ã€‚
+        /// </summary>
+        /// <param name="session">å®¢æˆ·ç«¯</param>
+        /// <param name="Data">æ•°æ®</param>
+        /// <returns>ç»è¿‡å¤„ç†åDataå‚æ•°ä¸­çš„æ•°æ®å¤§å°</returns>
+        public Byte[] OnServerToClient(Session session, Byte[] Data)
+        {
+            if (Plugins == null || Plugins.Count < 1) return Data;
+            if (Data == null || Data.Length < 1) return null;
 
-			for (var i = 0; i < Plugins.Count; i++)
-			{
-				Data = Plugins[i].OnServerToClient(session, Data);
-				if (Data == null || Data.Length < 1) return null;
-			}
-			return Data;
-		}
-		#endregion
+            for (var i = 0; i < Plugins.Count; i++)
+            {
+                Data = Plugins[i].OnServerToClient(session, Data);
+                if (Data == null || Data.Length < 1) return null;
+            }
+            return Data;
+        }
+        #endregion
 
-		#region ÈÕÖ¾
-		/// <summary>
-		/// Ğ´ÈÕÖ¾
-		/// </summary>
-		/// <param name="msg">ÈÕÖ¾</param>
-		public void WriteLog(String msg)
-		{
-			if (OnWriteLog != null)
-			{
-				if (Listener == null)
-					OnWriteLog(msg);
-				else
-					OnWriteLog(String.Format("[{0}] {1}", Listener.Config.Name, msg));
-			}
-		}
-		#endregion
+        #region æ—¥å¿—
+        /// <summary>
+        /// å†™æ—¥å¿—
+        /// </summary>
+        /// <param name="msg">æ—¥å¿—</param>
+        public void WriteLog(String msg)
+        {
+            if (OnWriteLog != null)
+            {
+                if (Listener == null)
+                    OnWriteLog(msg);
+                else
+                    OnWriteLog(String.Format("[{0}] {1}", Listener.Config.Name, msg));
+            }
+        }
+        #endregion
 
-		#region ¾²Ì¬ ²å¼ş¹ÜÀí
-		private static PluginConfig[] _AllPlugins;
-		/// <summary>
-		/// ËùÓĞ²å¼ş
-		/// </summary>
-		public static PluginConfig[] AllPlugins
-		{
-			get
-			{
-				LoadAllAssembly();
+        #region é™æ€ æ’ä»¶ç®¡ç†
+        private static PluginConfig[] _AllPlugins;
+        /// <summary>
+        /// æ‰€æœ‰æ’ä»¶
+        /// </summary>
+        public static PluginConfig[] AllPlugins
+        {
+            get
+            {
+                LoadAllAssembly();
 
-				var list = new List<PluginConfig>();
-				foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-				{
-					foreach (var t in asm.GetTypes())
-					{
-						if (t.GetInterface(typeof(IPlugin).Name) != null)
-						{
-							try
-							{
-								var ip = asm.CreateInstance(t.FullName) as IPlugin;
-								if (ip != null) list.Add(ip.DefaultConfig);
-							}
-							catch { }
-						}
-					}
-				}
-				_AllPlugins = new PluginConfig[list.Count];
-				list.CopyTo(_AllPlugins);
+                var list = new List<PluginConfig>();
+                foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    foreach (var t in asm.GetTypes())
+                    {
+                        if (t.GetInterface(typeof(IPlugin).Name) != null)
+                        {
+                            try
+                            {
+                                var ip = asm.CreateInstance(t.FullName) as IPlugin;
+                                if (ip != null) list.Add(ip.DefaultConfig);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                _AllPlugins = new PluginConfig[list.Count];
+                list.CopyTo(_AllPlugins);
 
-				return _AllPlugins;
-			}
-		}
+                return _AllPlugins;
+            }
+        }
 
-		private static PluginConfig[] _AllHttpPlugins;
-		/// <summary>
-		/// ËùÓĞHttp²å¼ş
-		/// </summary>
-		public static PluginConfig[] AllHttpPlugins
-		{
-			get
-			{
-				LoadAllAssembly();
+        private static PluginConfig[] _AllHttpPlugins;
+        /// <summary>
+        /// æ‰€æœ‰Httpæ’ä»¶
+        /// </summary>
+        public static PluginConfig[] AllHttpPlugins
+        {
+            get
+            {
+                LoadAllAssembly();
 
-				var list = new List<PluginConfig>();
-				foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-				{
-					foreach (var t in asm.GetTypes())
-					{
-						//¼ÓÉÏIsAbstractµÄÅĞ¶Ï£¬·ÀÖ¹°Ñ³éÏó²å¼ş»ùÀàÊ¶±ğÎª²å¼ş
-						if (!t.IsAbstract && t.GetInterface(typeof(IHttpPlugin).Name) != null)
-						{
-							try
-							{
-								var ip = asm.CreateInstance(t.FullName) as IHttpPlugin;
-								if (ip != null) list.Add(ip.DefaultConfig);
-							}
-							catch { }
-						}
-					}
-				}
-				_AllHttpPlugins = new PluginConfig[list.Count];
-				list.CopyTo(_AllHttpPlugins);
+                var list = new List<PluginConfig>();
+                foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    foreach (var t in asm.GetTypes())
+                    {
+                        //åŠ ä¸ŠIsAbstractçš„åˆ¤æ–­ï¼Œé˜²æ­¢æŠŠæŠ½è±¡æ’ä»¶åŸºç±»è¯†åˆ«ä¸ºæ’ä»¶
+                        if (!t.IsAbstract && t.GetInterface(typeof(IHttpPlugin).Name) != null)
+                        {
+                            try
+                            {
+                                var ip = asm.CreateInstance(t.FullName) as IHttpPlugin;
+                                if (ip != null) list.Add(ip.DefaultConfig);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                _AllHttpPlugins = new PluginConfig[list.Count];
+                list.CopyTo(_AllHttpPlugins);
 
-				return _AllHttpPlugins;
-			}
-		}
+                return _AllHttpPlugins;
+            }
+        }
 
-		private static void LoadAllAssembly()
-		{
-			var path = AppDomain.CurrentDomain.BaseDirectory;
-			//path = Path.Combine(path, "Plugins");
-			if (!Directory.Exists(path)) return;
+        private static void LoadAllAssembly()
+        {
+            var path = AppDomain.CurrentDomain.BaseDirectory;
+            //path = Path.Combine(path, "Plugins");
+            if (!Directory.Exists(path)) return;
 
-            //²»ÄÜÊ¹ÓÃAllDirectories£¬µ±ºÜ¶à×ÓÄ¿Â¼µÄÊ±ºò£¬»á¿¨ËÀ³ÌĞò
-			var fs = Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
-			if (fs == null || fs.Length < 1) return;
+            //ä¸èƒ½ä½¿ç”¨AllDirectoriesï¼Œå½“å¾ˆå¤šå­ç›®å½•çš„æ—¶å€™ï¼Œä¼šå¡æ­»ç¨‹åº
+            var fs = Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
+            if (fs == null || fs.Length < 1) return;
 
-			foreach (var s in fs)
-			{
-				try
-				{
-					Assembly.LoadFile(s);
-				}
-				catch { }
-			}
-		}
-		#endregion
-	}
+            foreach (var s in fs)
+            {
+                try
+                {
+                    Assembly.LoadFile(s);
+                }
+                catch { }
+            }
+        }
+        #endregion
+    }
 }

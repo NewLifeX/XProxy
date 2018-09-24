@@ -15,11 +15,12 @@ namespace XP
         [STAThread]
         static void Main()
         {
-            var Args = Environment.GetCommandLineArgs();
+            XTrace.UseWinForm();
 
-            if (Args.Length > 1)
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
             {
-                if (Args[1].ToLower() == "-s")  //启动服务
+                if (args[1].ToLower() == "-s")  //启动服务
                 {
                     var ServicesToRun = new ServiceBase[] { new XProxySvc() };
                     try
@@ -33,12 +34,12 @@ namespace XP
                     }
                     return;
                 }
-                else if (Args[1].ToLower() == "-i") //安装服务
+                else if (args[1].ToLower() == "-i") //安装服务
                 {
                     Install(true);
                     return;
                 }
-                else if (Args[1].ToLower() == "-u") //卸载服务
+                else if (args[1].ToLower() == "-u") //卸载服务
                 {
                     Install(false);
                     return;
@@ -66,9 +67,9 @@ namespace XP
             if (!File.Exists(path)) return;
             si.FileName = path;
             if (isinstall)
-                si.Arguments = String.Format("create XProxySvc BinPath= \"{0} -s\" start= auto DisplayName= 新生命XProxy代理服务器", Application.ExecutablePath);
+                si.Arguments = String.Format("create XProxy BinPath= \"{0} -s\" start= auto DisplayName= XProxy代理服务器", Application.ExecutablePath);
             else
-                si.Arguments = @"Delete XProxySvc";
+                si.Arguments = @"Delete XProxy";
             si.UseShellExecute = false;
             si.CreateNoWindow = false;
             p.StartInfo = si;

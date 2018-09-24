@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -8,47 +8,41 @@ using System.Threading;
 namespace XProxy.Base
 {
     /// <summary>
-    /// ÉùÃ÷µ± <c>¿Í»§¶Ë</c> ¶Ï¿ªÓë·şÎñÆ÷µÄÁ´½ÓÊ±µÄ»Øµ÷·½·¨
+    /// å£°æ˜å½“ <c>å®¢æˆ·ç«¯</c> æ–­å¼€ä¸æœåŠ¡å™¨çš„é“¾æ¥æ—¶çš„å›è°ƒæ–¹æ³•
     /// </summary>
-    /// <param name="session">Òª¹Ø±ÕÆäÁ´½ÓµÄ <c>¿Í»§¶Ë</c></param>
+    /// <param name="session">è¦å…³é—­å…¶é“¾æ¥çš„ <c>å®¢æˆ·ç«¯</c></param>
     public delegate Boolean DestroyDelegate(Session session);
     /// <summary>
-    /// Ğ´ÈÕÖ¾Î¯ÍĞ
+    /// å†™æ—¥å¿—å§”æ‰˜
     /// </summary>
-    /// <param name="msg">ÈÕÖ¾ĞÅÏ¢</param>
+    /// <param name="msg">æ—¥å¿—ä¿¡æ¯</param>
     public delegate void WriteLogDelegate(String msg);
 
-    ///<summary>ÉùÃ÷ <c>¿Í»§¶Ë</c> µÄ»ù±¾·½·¨ºÍÊôĞÔ</summary>
-    ///<remarks>¿Í»§¶ËÀàÃèÊö¿Í»§¶ËºÍ·şÎñÆ÷µÄÁ´½Ó</remarks>
+    ///<summary>å£°æ˜ <c>å®¢æˆ·ç«¯</c> çš„åŸºæœ¬æ–¹æ³•å’Œå±æ€§</summary>
+    ///<remarks>å®¢æˆ·ç«¯ç±»æè¿°å®¢æˆ·ç«¯å’ŒæœåŠ¡å™¨çš„é“¾æ¥</remarks>
     public class Session : IDisposable
     {
-        #region ÊÂ¼ş
+        #region äº‹ä»¶
         /// <summary>
-        /// ¿Í»§¶Ë±»Ïú»ÙÊÂ¼ş
+        /// å®¢æˆ·ç«¯è¢«é”€æ¯äº‹ä»¶
         /// </summary>
         public event DestroyDelegate OnDestroy;
 
         /// <summary>
-        /// Ğ´ÈÕÖ¾ÊÂ¼ş
+        /// å†™æ—¥å¿—äº‹ä»¶
         /// </summary>
         public event WriteLogDelegate OnWriteLog;
         #endregion
 
-        #region ÊôĞÔ
-        #region Á¬½Ó
-        private Connection _Client;
+        #region å±æ€§
         /// <summary>
-        /// ¿Í»§¶ËÁ¬½Ó
+        /// å®¢æˆ·ç«¯è¿æ¥
         /// </summary>
-        public Connection Client
-        {
-            get { return _Client; }
-            set { _Client = value; }
-        }
+        public Connection Client { get; set; }
 
         private Connection _Server;
         /// <summary>
-        /// ·şÎñÆ÷Á¬½Ó
+        /// æœåŠ¡å™¨è¿æ¥
         /// </summary>
         public Connection Server
         {
@@ -59,14 +53,16 @@ namespace XProxy.Base
                     var tcpclient = ConnectServer(true);
                     if (tcpclient != null)
                     {
-                        _Server = new Connection(tcpclient);
-                        _Server.Name = "·şÎñÆ÷";
-                        _Server.Session = this;
+                        _Server = new Connection(tcpclient)
+                        {
+                            Name = "æœåŠ¡å™¨",
+                            Session = this
+                        };
                         _Server.OnRead += new ReadCompleteDelegate(OnServerToClient);
 
                         if (IsAsync)
                         {
-                            // Á¬½ÓÒÑ¾­½¨Á¢£¬±ØĞë½¨Á¢Ò»¸öµÈ´ı·şÎñÆ÷Êı¾İµÄÎ¯ÍĞ
+                            // è¿æ¥å·²ç»å»ºç«‹ï¼Œå¿…é¡»å»ºç«‹ä¸€ä¸ªç­‰å¾…æœåŠ¡å™¨æ•°æ®çš„å§”æ‰˜
                             _Server.BeginRead();
                         }
                         else
@@ -79,155 +75,106 @@ namespace XProxy.Base
             }
             set { _Server = value; }
         }
-        #endregion
-
-        #region ·şÎñÆ÷
-        private Int32 _ServerPort;
         /// <summary>
-        /// ·şÎñÆ÷¶Ë¿Ú
+        /// æœåŠ¡å™¨ç«¯å£
         /// </summary>
-        public Int32 ServerPort
-        {
-            get { return _ServerPort; }
-            set { _ServerPort = value; }
-        }
-
-        private IPAddress _ServerAddress;
+        public Int32 ServerPort { get; set; }
         /// <summary>
-        /// ·şÎñÆ÷µØÖ·
+        /// æœåŠ¡å™¨åœ°å€
         /// </summary>
-        public IPAddress ServerAddress
-        {
-            get { return _ServerAddress; }
-            set { _ServerAddress = value; }
-        }
-        #endregion
-
-        #region »ù±¾ÊôĞÔ
-        private String _GUID = NewGuid();
+        public IPAddress ServerAddress { get; set; }
         /// <summary>
-        /// ¶ÔÏóÎ¨Ò»±êÊ¶
+        /// å¯¹è±¡å”¯ä¸€æ ‡è¯†
         /// </summary>
-        public String GUID
-        {
-            get { return _GUID; }
-        }
+        public String GUID { get; } = NewGuid();
 
         private static Int32 _NewGuid = 1;
-        private static String NewGuid()
-        {
-            return (_NewGuid++).ToString();
-        }
+        private static String NewGuid() => (_NewGuid++).ToString();
 
-        private DateTime _StartTime = DateTime.Now;
         /// <summary>
-        /// ¿ªÊ¼Ê±¼ä
+        /// å¼€å§‹æ—¶é—´
         /// </summary>
-        public DateTime StartTime
-        {
-            get { return _StartTime; }
-        }
-
-        private Int32 _TimeOut = 30000;
+        public DateTime StartTime { get; } = DateTime.Now;
         /// <summary>
-        /// ³¬Ê±Ê±¼ä¡£Ä¬ÈÏ30Ãë
+        /// è¶…æ—¶æ—¶é—´ã€‚é»˜è®¤30ç§’
         /// </summary>
-        public Int32 TimeOut
-        {
-            get { return _TimeOut; }
-            set { _TimeOut = value; }
-        }
-        #endregion
-
-        #region À©Õ¹
-        private String _IPAndPort = String.Empty;
+        public Int32 TimeOut { get; set; } = 30000;
         /// <summary>
-        /// IP¶Ë¿Ú
+        /// IPç«¯å£
         /// </summary>
-        public String IPAndPort
-        {
-            get { return _IPAndPort; }
-            set { _IPAndPort = value; }
-        }
-
-        private Listener _Listener;
+        public String IPAndPort { get; set; } = String.Empty;
         /// <summary>
-        /// ¶ÔÓ¦µÄ¼àÌıÆ÷
+        /// å¯¹åº”çš„ç›‘å¬å™¨
         /// </summary>
-        public Listener Listener
-        {
-            get { return _Listener; }
-            set { _Listener = value; }
-        }
-
-        private Dictionary<String, Object> _Items = new Dictionary<String, Object>();
+        public Listener Listener { get; set; }
         /// <summary>
-        /// Êı¾İÏî¡£ÓÃÓÚ´æ´¢À©Õ¹Êı¾İ
+        /// æ•°æ®é¡¹ã€‚ç”¨äºå­˜å‚¨æ‰©å±•æ•°æ®
         /// </summary>
-        public Dictionary<String, Object> Items { get { return _Items; } set { _Items = value; } }
+        public Dictionary<String, Object> Items { get; set; } = new Dictionary<String, Object>();
 
-		/// <summary>
-		/// Ê¹ÓÃÒì²½
-		/// </summary>
+        /// <summary>
+        /// ä½¿ç”¨å¼‚æ­¥
+        /// </summary>
         public Boolean IsAsync
         {
             get { return Listener.Config.IsAsync; }
             set { Listener.Config.IsAsync = value; }
         }
         #endregion
-        #endregion
 
-        #region ¹¹Ôìº¯Êı
+        #region æ„é€ å‡½æ•°
         /// <summary>
-        /// ³õÊ¼»¯Ò»¸ö¿Í»§¶ËÊµÀı
+        /// åˆå§‹åŒ–ä¸€ä¸ªå®¢æˆ·ç«¯å®ä¾‹
         /// </summary>
-        /// <param name="tcpclient">µ½¿Í»§¶ËµÄÁ¬½Ó</param>
+        /// <param name="tcpclient">åˆ°å®¢æˆ·ç«¯çš„è¿æ¥</param>
         public Session(TcpClient tcpclient)
-			: this(tcpclient, 0, IPAddress.Any)
-		{
-		}
+            : this(tcpclient, 0, IPAddress.Any)
+        {
+        }
 
         /// <summary>
-        /// ³õÊ¼»¯Ò»¸ö¿Í»§¶ËÊµÀı
+        /// åˆå§‹åŒ–ä¸€ä¸ªå®¢æˆ·ç«¯å®ä¾‹
         /// </summary>
-        /// <param name="tcpclient">µ½¿Í»§¶ËµÄÁ¬½Ó</param>
-        /// <param name="port">Ô¶³Ì·şÎñÆ÷¶Ë¿Ú</param>
-        /// <param name="address">Ô¶³Ì·şÎñÆ÷µØÖ·</param>
+        /// <param name="tcpclient">åˆ°å®¢æˆ·ç«¯çš„è¿æ¥</param>
+        /// <param name="port">è¿œç¨‹æœåŠ¡å™¨ç«¯å£</param>
+        /// <param name="address">è¿œç¨‹æœåŠ¡å™¨åœ°å€</param>
         public Session(TcpClient tcpclient, Int32 port, String address)
             : this(tcpclient, port, address == "0.0.0.0" ? IPAddress.Any : Dns.GetHostEntry(address).AddressList[0])
         {
         }
 
         /// <summary>
-        /// ³õÊ¼»¯Ò»¸ö¿Í»§¶ËÊµÀı
+        /// åˆå§‹åŒ–ä¸€ä¸ªå®¢æˆ·ç«¯å®ä¾‹
         /// </summary>
-        /// <param name="tcpclient">µ½¿Í»§¶ËµÄÁ¬½Ó</param>
-        /// <param name="port">Ô¶³Ì·şÎñÆ÷¶Ë¿Ú</param>
-        /// <param name="address">Ô¶³Ì·şÎñÆ÷µØÖ·</param>
+        /// <param name="tcpclient">åˆ°å®¢æˆ·ç«¯çš„è¿æ¥</param>
+        /// <param name="port">è¿œç¨‹æœåŠ¡å™¨ç«¯å£</param>
+        /// <param name="address">è¿œç¨‹æœåŠ¡å™¨åœ°å€</param>
         public Session(TcpClient tcpclient, Int32 port, IPAddress address)
         {
-            Client = new Connection(tcpclient);
-            Client.Session = this;
-            Client.Name = "¿Í»§¶Ë";
+            Client = new Connection(tcpclient)
+            {
+                Session = this,
+                Name = "å®¢æˆ·ç«¯"
+            };
             Client.OnRead += new ReadCompleteDelegate(OnClientToServer);
             IPAndPort = tcpclient.Client.RemoteEndPoint.ToString();
 
-            // ÔÚ·¢ËÍ»ò½ÓÊÕ»º³åÇøÎ´ÂúÊ±½ûÓÃÑÓ³Ù£¬ÈÃÆäÂíÉÏ·¢ËÍÊı¾İ
-			// WinsockµÄNagleËã·¨½«½µµÍĞ¡Êı¾İ±¨µÄ·¢ËÍËÙ¶È£¬¶øÏµÍ³Ä¬ÈÏÊÇÊ¹ÓÃNagleËã·¨
-			// Nagle Ëã·¨Ê¹Ì×½Ó×Ö»º³å×î¶à 200 ºÁÃëÄÚµÄÊı¾İ°ü£¬È»ºóÊ¹ÓÃÒ»¸öÊı¾İ°ü·¢ËÍËüÃÇ£¬´Ó¶ø¼õÉÙÍøÂçÁ÷Á¿
-			// ÕâÀï¹Ø±ÕNagleËã·¨£¬ÒÔ¼Ó¿ìÍøÂç´¦ÀíËÙ¶È
+            // åœ¨å‘é€æˆ–æ¥æ”¶ç¼“å†²åŒºæœªæ»¡æ—¶ç¦ç”¨å»¶è¿Ÿï¼Œè®©å…¶é©¬ä¸Šå‘é€æ•°æ®
+            // Winsockçš„Nagleç®—æ³•å°†é™ä½å°æ•°æ®æŠ¥çš„å‘é€é€Ÿåº¦ï¼Œè€Œç³»ç»Ÿé»˜è®¤æ˜¯ä½¿ç”¨Nagleç®—æ³•
+            // Nagle ç®—æ³•ä½¿å¥—æ¥å­—ç¼“å†²æœ€å¤š 200 æ¯«ç§’å†…çš„æ•°æ®åŒ…ï¼Œç„¶åä½¿ç”¨ä¸€ä¸ªæ•°æ®åŒ…å‘é€å®ƒä»¬ï¼Œä»è€Œå‡å°‘ç½‘ç»œæµé‡
+            // è¿™é‡Œå…³é—­Nagleç®—æ³•ï¼Œä»¥åŠ å¿«ç½‘ç»œå¤„ç†é€Ÿåº¦
             tcpclient.NoDelay = true;
-            
+
             ServerPort = port;
             ServerAddress = address;
         }
         #endregion
 
-        #region Îö¹¹º¯Êı ÒÔ¼° Dispose×ÊÔ´»ØÊÕ
+        #region ææ„å‡½æ•° ä»¥åŠ Disposeèµ„æºå›æ”¶
         /// <summary>
-        /// Ïú»Ù¿Í»§¶ËÕ¼ÓÃµÄ×ÊÔ´
+        /// é”€æ¯å®¢æˆ·ç«¯å ç”¨çš„èµ„æº
         /// </summary>
-        /// <param name="msg">ÏûÏ¢</param>
+        /// <param name="msg">æ¶ˆæ¯</param>
         public void Dispose(String msg)
         {
             WriteLog(msg);
@@ -235,8 +182,8 @@ namespace XProxy.Base
         }
 
         private Boolean IsDisposed = false;
-        ///<summary>Ïú»Ù¿Í»§¶ËÕ¼ÓÃµÄ×ÊÔ´</summary>
-        ///<remarks>¹Ø±ÕËùÓĞÓë¿Í»§¶ËºÍ·şÎñÆ÷µÄÁ´½Ó</remarks>
+        ///<summary>é”€æ¯å®¢æˆ·ç«¯å ç”¨çš„èµ„æº</summary>
+        ///<remarks>å…³é—­æ‰€æœ‰ä¸å®¢æˆ·ç«¯å’ŒæœåŠ¡å™¨çš„é“¾æ¥</remarks>
         ///<seealso cref ="System.IDisposable"/>
         public void Dispose()
         {
@@ -251,7 +198,7 @@ namespace XProxy.Base
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine("¹Ø±Õ¿Í»§¶ËÁ¬½Ó³ö´í£¡" + ex.Message);
+                    Trace.WriteLine("å…³é—­å®¢æˆ·ç«¯è¿æ¥å‡ºé”™ï¼" + ex.Message);
                 }
                 try
                 {
@@ -259,7 +206,7 @@ namespace XProxy.Base
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine("¹Ø±ÕÔ¶³Ì·şÎñÆ÷Á¬½Ó³ö´í£¡" + ex.Message);
+                    Trace.WriteLine("å…³é—­è¿œç¨‹æœåŠ¡å™¨è¿æ¥å‡ºé”™ï¼" + ex.Message);
                 }
                 if (OnDestroy != null)
                     OnDestroy(this);
@@ -267,7 +214,7 @@ namespace XProxy.Base
         }
 
         /// <summary>
-        /// Îö¹¹º¯Êı
+        /// ææ„å‡½æ•°
         /// </summary>
         ~Session()
         {
@@ -275,9 +222,9 @@ namespace XProxy.Base
         }
         #endregion
 
-        #region Êı¾İ½»»»¹ı³Ì
-        #region ¿ªÊ¼
-        ///<summary>½ÓÊÜ¿Í»§¶Ë¶ËÁ¬½Ó£¬¿ªÊ¼´úÀí¹¤×÷</summary>
+        #region æ•°æ®äº¤æ¢è¿‡ç¨‹
+        #region å¼€å§‹
+        ///<summary>æ¥å—å®¢æˆ·ç«¯ç«¯è¿æ¥ï¼Œå¼€å§‹ä»£ç†å·¥ä½œ</summary>
         public void Start()
         {
             if (!Listener.Plugin.OnClientStart(this))
@@ -285,19 +232,19 @@ namespace XProxy.Base
                 Dispose();
                 return;
             }
-			//Òì²½»òÍ¬²½
+            //å¼‚æ­¥æˆ–åŒæ­¥
             if (IsAsync)
                 Client.BeginRead();
             else
             {
-                //ÏÖÔÚ»¹ÔÚÖ÷Ïß³Ì£¬±ØĞë¿ªĞÂÏß³ÌÀ´½øĞĞÍ¬²½´¦Àí
+                //ç°åœ¨è¿˜åœ¨ä¸»çº¿ç¨‹ï¼Œå¿…é¡»å¼€æ–°çº¿ç¨‹æ¥è¿›è¡ŒåŒæ­¥å¤„ç†
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ExchangeClient));
             }
         }
         #endregion
 
-		#region Í¬²½½»»»
-		/// <summary>Í¬²½½»»»</summary>
+        #region åŒæ­¥äº¤æ¢
+        /// <summary>åŒæ­¥äº¤æ¢</summary>
         protected void ExchangeClient(Object obj)
         {
             try
@@ -309,18 +256,18 @@ namespace XProxy.Base
                     buf = OnClientToServer(buf);
                     if (buf == null || buf.Length < 1) break;
 
-                    //Ğ´Èë·şÎñ¶Ë
+                    //å†™å…¥æœåŠ¡ç«¯
                     Server.Write(buf);
                 }
                 Dispose();
             }
             catch (Exception ex)
             {
-                Dispose("Í¬²½½»»»¿Í»§¶ËÊı¾İÊ±³ö´í " + ex.Message);
+                Dispose("åŒæ­¥äº¤æ¢å®¢æˆ·ç«¯æ•°æ®æ—¶å‡ºé”™ " + ex.Message);
             }
         }
 
-        /// <summary>Í¬²½½»»»</summary>
+        /// <summary>åŒæ­¥äº¤æ¢</summary>
         protected void ExchangeServer(Object obj)
         {
             try
@@ -332,25 +279,25 @@ namespace XProxy.Base
                     buf = OnServerToClient(buf);
                     if (buf == null || buf.Length < 1) break;
 
-                    //Ğ´Èë¿Í»§¶Ë
+                    //å†™å…¥å®¢æˆ·ç«¯
                     Client.Write(buf);
                 }
                 Dispose();
             }
             catch (Exception ex)
             {
-                Dispose("Í¬²½½»»»·şÎñ¶ËÊı¾İÊ±³ö´í " + ex.Message);
+                Dispose("åŒæ­¥äº¤æ¢æœåŠ¡ç«¯æ•°æ®æ—¶å‡ºé”™ " + ex.Message);
             }
         }
         #endregion
-		#endregion
+        #endregion
 
-		#region Êı¾İ½»»»ÊÂ¼ş
-		/// <summary>
-        /// ¿Í»§¶ËÏò·şÎñÆ÷·¢Êı¾İÊ±´¥·¢¡£ÖØÔØÊ±Ó¦¸Ãµ÷ÓÃ¸Ã·½·¨£¬ÒÔ±£Ö¤ÄÜÊä³öÈÕÖ¾ºÍµ÷ÓÃ²å¼ş¡£
+        #region æ•°æ®äº¤æ¢äº‹ä»¶
+        /// <summary>
+        /// å®¢æˆ·ç«¯å‘æœåŠ¡å™¨å‘æ•°æ®æ—¶è§¦å‘ã€‚é‡è½½æ—¶åº”è¯¥è°ƒç”¨è¯¥æ–¹æ³•ï¼Œä»¥ä¿è¯èƒ½è¾“å‡ºæ—¥å¿—å’Œè°ƒç”¨æ’ä»¶ã€‚
         /// </summary>
-        /// <param name="Data">Êı¾İ</param>
-        /// <returns>¾­¹ı´¦ÀíºóµÄÊı¾İ</returns>
+        /// <param name="Data">æ•°æ®</param>
+        /// <returns>ç»è¿‡å¤„ç†åçš„æ•°æ®</returns>
         internal virtual Byte[] OnClientToServer(Byte[] Data)
         {
             if (Data == null || Data.Length < 1) return null;
@@ -358,9 +305,9 @@ namespace XProxy.Base
             Data = Listener.Plugin.OnClientToServer(this, Data);
 
             if (Listener.Config.IsShowClientData)
-                WriteLog("¿Í»§¶ËÊı¾İ£¨" + Data.Length + "Byte£©£¨" + GUID + "£©");
+                WriteLog("å®¢æˆ·ç«¯æ•°æ®ï¼ˆ" + Data.Length + "Byteï¼‰ï¼ˆ" + GUID + "ï¼‰");
 
-            //Òì²½·½Ê½Ê±£¬±¾º¯Êı´¦ÓÚ½ÓÊÕÊÂ¼şÖĞ£¬ĞèÒªÊ¹ÓÃÒì²½Ğ´Èë£¬Ê¹µÃÄÜ¾¡¿ì½øÈëÏÂÒ»ÂÖÊı¾İµÄ½ÓÊÕ¹ı³ÌÖ®ÖĞ
+            //å¼‚æ­¥æ–¹å¼æ—¶ï¼Œæœ¬å‡½æ•°å¤„äºæ¥æ”¶äº‹ä»¶ä¸­ï¼Œéœ€è¦ä½¿ç”¨å¼‚æ­¥å†™å…¥ï¼Œä½¿å¾—èƒ½å°½å¿«è¿›å…¥ä¸‹ä¸€è½®æ•°æ®çš„æ¥æ”¶è¿‡ç¨‹ä¹‹ä¸­
             if (IsAsync)
                 Server.BeginWrite(Data);
             else
@@ -370,18 +317,18 @@ namespace XProxy.Base
         }
 
         /// <summary>
-        /// ·şÎñÆ÷Ïà¿Í»§¶Ë·¢Êı¾İÊ±´¥·¢¡£ÖØÔØÊ±Ó¦¸Ãµ÷ÓÃ¸Ã·½·¨£¬ÒÔ±£Ö¤ÄÜÊä³öÈÕÖ¾ºÍµ÷ÓÃ²å¼ş¡£
+        /// æœåŠ¡å™¨ç›¸å®¢æˆ·ç«¯å‘æ•°æ®æ—¶è§¦å‘ã€‚é‡è½½æ—¶åº”è¯¥è°ƒç”¨è¯¥æ–¹æ³•ï¼Œä»¥ä¿è¯èƒ½è¾“å‡ºæ—¥å¿—å’Œè°ƒç”¨æ’ä»¶ã€‚
         /// </summary>
-        /// <param name="Data">Êı¾İ</param>
-        /// <returns>¾­¹ı´¦ÀíºóµÄÊı¾İ</returns>
+        /// <param name="Data">æ•°æ®</param>
+        /// <returns>ç»è¿‡å¤„ç†åçš„æ•°æ®</returns>
         internal virtual Byte[] OnServerToClient(Byte[] Data)
         {
             if (Data == null || Data.Length < 1) return null;
 
             Data = Listener.Plugin.OnServerToClient(this, Data);
 
-            if (Listener.Config.IsShowServerData) 
-                WriteLog("·şÎñ¶ËÊı¾İ£¨" + Data.Length + "Byte£©£¨" + GUID + "£©");
+            if (Listener.Config.IsShowServerData)
+                WriteLog("æœåŠ¡ç«¯æ•°æ®ï¼ˆ" + Data.Length + "Byteï¼‰ï¼ˆ" + GUID + "ï¼‰");
 
             if (IsAsync)
                 Client.BeginWrite(Data);
@@ -392,12 +339,12 @@ namespace XProxy.Base
         }
         #endregion
 
-        #region Á¬½Ó·şÎñÆ÷
+        #region è¿æ¥æœåŠ¡å™¨
         /// <summary>
-        /// Á¬½Ó·şÎñÆ÷
+        /// è¿æ¥æœåŠ¡å™¨
         /// </summary>
-        /// <param name="KeepAlive">ÊÇ·ñÊ¹ÓÃKeepAlive</param>
-        /// <returns>Á¬½Ó</returns>
+        /// <param name="KeepAlive">æ˜¯å¦ä½¿ç”¨KeepAlive</param>
+        /// <returns>è¿æ¥</returns>
         protected TcpClient ConnectServer(Boolean KeepAlive)
         {
             TcpClient tcpclient = null;
@@ -406,9 +353,9 @@ namespace XProxy.Base
             {
                 tcpclient = new TcpClient();
                 tcpclient.Connect(ServerAddress, ServerPort);
-                // ÔÚ·¢ËÍ»ò½ÓÊÕ»º³åÇøÎ´ÂúÊ±½ûÓÃÑÓ³Ù
+                // åœ¨å‘é€æˆ–æ¥æ”¶ç¼“å†²åŒºæœªæ»¡æ—¶ç¦ç”¨å»¶è¿Ÿ
                 tcpclient.NoDelay = true;
-                // ²»Òª±£³ÖÁ¬½Ó¡£±ØÒªÊ±£¬Òª¶Ï¿ªÁ¬½Ó£¬ÒÔÃâÓ°Ïì·şÎñÆ÷ĞÔÄÜ¡£
+                // ä¸è¦ä¿æŒè¿æ¥ã€‚å¿…è¦æ—¶ï¼Œè¦æ–­å¼€è¿æ¥ï¼Œä»¥å…å½±å“æœåŠ¡å™¨æ€§èƒ½ã€‚
                 if (KeepAlive)
                 {
                     tcpclient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
@@ -417,22 +364,22 @@ namespace XProxy.Base
             }
             catch (Exception ex)
             {
-                Dispose("Á¬½Ó·şÎñÆ÷³ö´í " + ex.Message);
+                Dispose("è¿æ¥æœåŠ¡å™¨å‡ºé”™ " + ex.Message);
                 return null;
             }
             return tcpclient;
         }
         #endregion
 
-        #region ¸¨Öúº¯Êı
-        ///<summary>ÊäÈëÈÕÖ¾</summary>
-        ///<remarks>ÊäÈëÈÕÖ¾ĞÅÏ¢µ½UIĞÅÏ¢¿ò</remarks>
-        ///<param name="log">ÒªÊä³öµÄÈÕÖ¾ĞÅÏ¢</param>
+        #region è¾…åŠ©å‡½æ•°
+        ///<summary>è¾“å…¥æ—¥å¿—</summary>
+        ///<remarks>è¾“å…¥æ—¥å¿—ä¿¡æ¯åˆ°UIä¿¡æ¯æ¡†</remarks>
+        ///<param name="log">è¦è¾“å‡ºçš„æ—¥å¿—ä¿¡æ¯</param>
         public void WriteLog(String log)
         {
             if (OnWriteLog != null)
             {
-                //Ê¹ÓÃÏß³Ì³ØÏß³ÌĞ´ÈÕÖ¾
+                //ä½¿ç”¨çº¿ç¨‹æ± çº¿ç¨‹å†™æ—¥å¿—
                 ThreadPool.QueueUserWorkItem(new WaitCallback(WriteLogCallBack), String.Format("[{2}]{0,6} {1}", GUID, log, Listener.Config.Name));
             }
         }

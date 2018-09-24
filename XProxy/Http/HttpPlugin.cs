@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Text;
 using XProxy.Plugin;
@@ -10,54 +10,47 @@ using XProxy.Base;
 namespace XProxy.Http
 {
 	/// <summary>
-	/// Http²å¼şÀà
+	/// Httpæ’ä»¶ç±»
 	/// </summary>
 	public class HttpPlugin : PluginBase
 	{
-		#region ÊôĞÔ
-		private Boolean _RequestDelay = false;
-		/// <summary>
-		/// ÇëÇóÑÓ³Ù¡£
-		/// ÊÕµ½Ò»¸öÍêÕûµÄÇëÇóºó£¬²Å×ª·¢£¬·ñÔòÖ±½Ó×ª·¢¡£
-		/// Èç¹ûÒª´¦ÀíÕû¸öÇëÇó°ü£¬ÇëÆôÓÃÑÓ³Ù¡£
-		/// ÆôÓÃÑÓ³Ù½«ĞèÒªºÜ´óµÄÄÚ´æ×ÊÔ´À´»º´æÊı¾İ¡£
-		/// </summary>
-		public Boolean RequestDelay { get { return _RequestDelay; } set { _RequestDelay = value; } }
+        #region å±æ€§
+        /// <summary>
+        /// è¯·æ±‚å»¶è¿Ÿã€‚
+        /// æ”¶åˆ°ä¸€ä¸ªå®Œæ•´çš„è¯·æ±‚åï¼Œæ‰è½¬å‘ï¼Œå¦åˆ™ç›´æ¥è½¬å‘ã€‚
+        /// å¦‚æœè¦å¤„ç†æ•´ä¸ªè¯·æ±‚åŒ…ï¼Œè¯·å¯ç”¨å»¶è¿Ÿã€‚
+        /// å¯ç”¨å»¶è¿Ÿå°†éœ€è¦å¾ˆå¤§çš„å†…å­˜èµ„æºæ¥ç¼“å­˜æ•°æ®ã€‚
+        /// </summary>
+        public Boolean RequestDelay { get; set; } = false;
 
-		private Boolean _ResponseDelay = false;
-		/// <summary>
-		/// ÏìÓ¦ÑÓ³Ù¡£
-		/// ÊÕµ½Ò»¸öÍêÕûµÄÏìÓ¦ºó£¬²Å×ª·¢£¬·ñÔòÖ±½Ó×ª·¢¡£
-		/// Èç¹ûÒª´¦ÀíÕû¸öÏìÓ¦°ü£¬ÇëÆôÓÃÑÓ³Ù¡£
-		/// ÆôÓÃÑÓ³Ù½«ĞèÒªºÜ´óµÄÄÚ´æ×ÊÔ´À´»º´æÊı¾İ¡£
-		/// </summary>
-		public Boolean ResponseDelay { get { return _ResponseDelay; } set { _ResponseDelay = value; } }
+        /// <summary>
+        /// å“åº”å»¶è¿Ÿã€‚
+        /// æ”¶åˆ°ä¸€ä¸ªå®Œæ•´çš„å“åº”åï¼Œæ‰è½¬å‘ï¼Œå¦åˆ™ç›´æ¥è½¬å‘ã€‚
+        /// å¦‚æœè¦å¤„ç†æ•´ä¸ªå“åº”åŒ…ï¼Œè¯·å¯ç”¨å»¶è¿Ÿã€‚
+        /// å¯ç”¨å»¶è¿Ÿå°†éœ€è¦å¾ˆå¤§çš„å†…å­˜èµ„æºæ¥ç¼“å­˜æ•°æ®ã€‚
+        /// </summary>
+        public Boolean ResponseDelay { get; set; } = false;
+        /// <summary>
+        /// æ’ä»¶é›†åˆã€‚å¤„ç†å„äº‹ä»¶çš„æ—¶å€™ï¼Œå°†æŒ‰ç…§å…ˆåé¡ºåºè°ƒç”¨æ’ä»¶çš„å¤„ç†æ–¹æ³•ã€‚
+        /// </summary>
+        public IList<IHttpPlugin> Plugins { get; set; }
 
-		private IList<IHttpPlugin> _Plugins;
-		/// <summary>
-		/// ²å¼ş¼¯ºÏ¡£´¦Àí¸÷ÊÂ¼şµÄÊ±ºò£¬½«°´ÕÕÏÈºóË³Ğòµ÷ÓÃ²å¼şµÄ´¦Àí·½·¨¡£
-		/// </summary>
-		public IList<IHttpPlugin> Plugins { get { return _Plugins; } set { _Plugins = value; } }
+        /// <summary>
+        /// æ˜¾ç¤ºè¯·æ±‚
+        /// </summary>
+        public Boolean ShowRequest { get; set; }
+        /// <summary>
+        /// æ˜¾ç¤ºå“åº”
+        /// </summary>
+        public Boolean ShowResponse { get; set; }
+        #endregion
 
-		private Boolean _ShowRequest;
-		/// <summary>
-		/// ÏÔÊ¾ÇëÇó
-		/// </summary>
-		public Boolean ShowRequest { get { return _ShowRequest; } set { _ShowRequest = value; } }
-
-		private Boolean _ShowResponse;
-		/// <summary>
-		/// ÏÔÊ¾ÏìÓ¦
-		/// </summary>
-		public Boolean ShowResponse { get { return _ShowResponse; } set { _ShowResponse = value; } }
-		#endregion
-
-		#region ¼ÓÔØ²å¼ş
-		/// <summary>
-		/// ¼ÓÔØ²å¼ş
-		/// </summary>
-		/// <param name="configs"></param>
-		private void LoadPlugin(IList<PluginConfig> configs)
+        #region åŠ è½½æ’ä»¶
+        /// <summary>
+        /// åŠ è½½æ’ä»¶
+        /// </summary>
+        /// <param name="configs"></param>
+        private void LoadPlugin(IList<PluginConfig> configs)
 		{
 			if (configs == null || configs.Count < 1) return;
 			var list = new List<IHttpPlugin>();
@@ -78,7 +71,7 @@ namespace XProxy.Http
 						}
 						catch (Exception ex)
 						{
-							WriteLog(String.Format("¼ÓÔØHttp²å¼ş³ö´í£º{0}\n{1}", config, ex));
+							WriteLog(String.Format("åŠ è½½Httpæ’ä»¶å‡ºé”™ï¼š{0}\n{1}", config, ex));
 							continue;
 						}
 					}
@@ -107,7 +100,7 @@ namespace XProxy.Http
 								{
 									p.Config = config;
 									list.Add(p);
-									WriteLog(String.Format("¼ÓÔØHttp²å¼ş£º{0}", config));
+									WriteLog(String.Format("åŠ è½½Httpæ’ä»¶ï¼š{0}", config));
 								}
 							}
 						}
@@ -118,11 +111,11 @@ namespace XProxy.Http
 		}
 		#endregion
 
-		#region IPlugin ³ÉÔ±
+		#region IPlugin æˆå‘˜
 		/// <summary>
-		/// ³õÊ¼»¯
+		/// åˆå§‹åŒ–
 		/// </summary>
-		/// <param name="manager">²å¼ş¹ÜÀíÆ÷</param>
+		/// <param name="manager">æ’ä»¶ç®¡ç†å™¨</param>
 		public override void OnInit(PluginManager manager)
 		{
 			Manager = manager;
@@ -136,7 +129,7 @@ namespace XProxy.Http
 				Plugins[i].OnInit(this);
 			}
 
-			//²»ÈÃºËĞÄÏÔÊ¾¿Í»§¶ËºÍ·şÎñÆ÷Êı¾İ£¬ÓÉÕâÀïÀ´ÏÔÊ¾
+			//ä¸è®©æ ¸å¿ƒæ˜¾ç¤ºå®¢æˆ·ç«¯å’ŒæœåŠ¡å™¨æ•°æ®ï¼Œç”±è¿™é‡Œæ¥æ˜¾ç¤º
 			ShowRequest = manager.Listener.Config.IsShow && manager.Listener.Config.IsShowClientData;
             ShowResponse = manager.Listener.Config.IsShow && manager.Listener.Config.IsShowServerData;
             manager.Listener.Config.IsShowClientData = false;
@@ -145,25 +138,25 @@ namespace XProxy.Http
 
 		public override Boolean OnClientStart(Session session)
 		{
-			//Ê¹ÓÃÍ¬²½
+			//ä½¿ç”¨åŒæ­¥
 			//session.IsAsync = false;
 
 			return base.OnClientStart(session);
 		}
 
 		/// <summary>
-		/// ¿Í»§¶ËÏò·şÎñÆ÷·¢Êı¾İÊ±´¥·¢¡£
+		/// å®¢æˆ·ç«¯å‘æœåŠ¡å™¨å‘æ•°æ®æ—¶è§¦å‘ã€‚
 		/// </summary>
-		/// <param name="session">¿Í»§¶Ë</param>
-		/// <param name="Data">Êı¾İ</param>
-		/// <returns>¾­¹ı´¦ÀíºóµÄÊı¾İ</returns>
+		/// <param name="session">å®¢æˆ·ç«¯</param>
+		/// <param name="Data">æ•°æ®</param>
+		/// <returns>ç»è¿‡å¤„ç†åçš„æ•°æ®</returns>
 		public override Byte[] OnClientToServer(Session session, Byte[] Data)
 		{
 			if (Plugins == null || Plugins.Count < 1) return Data;
 
-			//Ò»°ãµÄÇëÇó¶¼ÊÇASCII±àÂë£¬¿ÉÒÔÖ±½ÓÏÔÊ¾
+			//ä¸€èˆ¬çš„è¯·æ±‚éƒ½æ˜¯ASCIIç¼–ç ï¼Œå¯ä»¥ç›´æ¥æ˜¾ç¤º
 			if (ShowRequest)
-				session.WriteLog("ÇëÇóÍ·£¨" + Data.Length + "Byte£©£º\n" + Encoding.ASCII.GetString(Data));
+				session.WriteLog("è¯·æ±‚å¤´ï¼ˆ" + Data.Length + "Byteï¼‰ï¼š\n" + Encoding.ASCII.GetString(Data));
 
 			if (HttpHelper.IsHttpRequest(Data))
 			{
@@ -174,7 +167,7 @@ namespace XProxy.Http
 				for (var i = 0; i < Plugins.Count; i++)
 				{
 					bts = Plugins[i].OnRequestHeader(session, bts);
-					//Ö±½Ó×èÖ¹
+					//ç›´æ¥é˜»æ­¢
 					if (bts == null || bts.Length < 1) return null;
 				}
 
@@ -183,7 +176,7 @@ namespace XProxy.Http
 				//for (int i = 0; i < Plugins.Count; i++)
 				//{
 				//    header = Plugins[i].OnRequestHeader(session, header);
-				//    //Ö±½Ó×èÖ¹
+				//    //ç›´æ¥é˜»æ­¢
 				//    if (String.IsNullOrEmpty(header)) return null;
 				//}
 
@@ -191,14 +184,14 @@ namespace XProxy.Http
 
 				bts = ByteHelper.Cat(bts, Encoding.ASCII.GetBytes("\r\n\r\n"));
 
-				//ÊÇ·ñÓĞÊı¾İĞèÒª´¦Àí
+				//æ˜¯å¦æœ‰æ•°æ®éœ€è¦å¤„ç†
 				if (Data.Length > p + 4)
 				{
 					Data = ByteHelper.SubBytes(Data, p + 4, -1);
 					for (var i = 0; i < Plugins.Count; i++)
 					{
 						Data = Plugins[i].OnRequestContent(session, Data);
-						//Ö±½Ó×èÖ¹
+						//ç›´æ¥é˜»æ­¢
 						if (Data == null || Data.Length < 1) return null;
 					}
 					Data = ByteHelper.Cat(bts, Data);
@@ -211,7 +204,7 @@ namespace XProxy.Http
 				for (var i = 0; i < Plugins.Count; i++)
 				{
 					Data = Plugins[i].OnRequestContent(session, Data);
-					//Ö±½Ó×èÖ¹
+					//ç›´æ¥é˜»æ­¢
 					if (Data == null || Data.Length < 1) return null;
 				}
 			}
@@ -220,11 +213,11 @@ namespace XProxy.Http
 		}
 
 		/// <summary>
-		/// ·şÎñÆ÷Ïà¿Í»§¶Ë·¢Êı¾İÊ±´¥·¢¡£
+		/// æœåŠ¡å™¨ç›¸å®¢æˆ·ç«¯å‘æ•°æ®æ—¶è§¦å‘ã€‚
 		/// </summary>
-		/// <param name="session">¿Í»§¶Ë</param>
-		/// <param name="Data">Êı¾İ</param>
-		/// <returns>¾­¹ı´¦ÀíºóµÄÊı¾İ</returns>
+		/// <param name="session">å®¢æˆ·ç«¯</param>
+		/// <param name="Data">æ•°æ®</param>
+		/// <returns>ç»è¿‡å¤„ç†åçš„æ•°æ®</returns>
 		public override Byte[] OnServerToClient(Session session, Byte[] Data)
 		{
 			if (Plugins == null || Plugins.Count < 1) return Data;
@@ -238,20 +231,20 @@ namespace XProxy.Http
 				for (var i = 0; i < Plugins.Count; i++)
 				{
 					bts = Plugins[i].OnResponseHeader(session, bts);
-					//Ö±½Ó×èÖ¹
+					//ç›´æ¥é˜»æ­¢
 					if (bts == null || bts.Length < 1) return null;
 				}
 
 				var header = Encoding.ASCII.GetString(bts);
 
-				//¶ÔÓÚÏìÓ¦£¬Ö»ÄÜÖ±½ÓÏÔÊ¾Í·²¿£¬Ö»ÓĞÍ·²¿¿ÉÒÔÓÃASCII½âÂë
+				//å¯¹äºå“åº”ï¼Œåªèƒ½ç›´æ¥æ˜¾ç¤ºå¤´éƒ¨ï¼Œåªæœ‰å¤´éƒ¨å¯ä»¥ç”¨ASCIIè§£ç 
 				if (ShowResponse)
-					session.WriteLog("ÏìÓ¦Í·£¨" + Data.Length + "Byte£©£º\n" + header);
+					session.WriteLog("å“åº”å¤´ï¼ˆ" + Data.Length + "Byteï¼‰ï¼š\n" + header);
 
 				//for (int i = 0; i < Plugins.Count; i++)
 				//{
 				//    header = Plugins[i].OnResponseHeader(session, header);
-				//    //Ö±½Ó×èÖ¹
+				//    //ç›´æ¥é˜»æ­¢
 				//    if (String.IsNullOrEmpty(header)) return null;
 				//}
 
@@ -259,14 +252,14 @@ namespace XProxy.Http
 
 				bts = ByteHelper.Cat(bts, Encoding.ASCII.GetBytes("\r\n\r\n"));
 
-				//ÊÇ·ñÓĞÊı¾İĞèÒª´¦Àí
+				//æ˜¯å¦æœ‰æ•°æ®éœ€è¦å¤„ç†
 				if (Data.Length > p + 4)
 				{
 					Data = ByteHelper.SubBytes(Data, p + 4, -1);
 					for (var i = 0; i < Plugins.Count; i++)
 					{
 						Data = Plugins[i].OnResponseContent(session, Data);
-						//Ö±½Ó×èÖ¹
+						//ç›´æ¥é˜»æ­¢
 						if (Data == null || Data.Length < 1) return null;
 					}
 					Data = ByteHelper.Cat(bts, Data);
@@ -279,15 +272,15 @@ namespace XProxy.Http
                 if (ShowResponse)
                 {
 #if !DEBUG
-                    session.WriteLog("ÏìÓ¦Êı¾İ£¨" + Data.Length + "Byte£©");
+                    session.WriteLog("å“åº”æ•°æ®ï¼ˆ" + Data.Length + "Byteï¼‰");
 #else
-                    session.WriteLog("ÏìÓ¦Êı¾İ£¨" + Data.Length + "Byte£©£º\n" + Encoding.Default.GetString(Data));
+                    session.WriteLog("å“åº”æ•°æ®ï¼ˆ" + Data.Length + "Byteï¼‰ï¼š\n" + Encoding.Default.GetString(Data));
 #endif
                 }
 				for (var i = 0; i < Plugins.Count; i++)
 				{
 					Data = Plugins[i].OnResponseContent(session, Data);
-					//Ö±½Ó×èÖ¹
+					//ç›´æ¥é˜»æ­¢
 					if (Data == null || Data.Length < 1) return null;
 				}
 			}
@@ -296,24 +289,24 @@ namespace XProxy.Http
 		}
 
 		/// <summary>
-		/// Ä¬ÈÏÉèÖÃ
+		/// é»˜è®¤è®¾ç½®
 		/// </summary>
 		public override PluginConfig DefaultConfig
 		{
 			get
 			{
 				var pc = base.DefaultConfig;
-				pc.Name = "Http²å¼ş";
-				pc.Author = "´óÊ¯Í·";
+				pc.Name = "Httpæ’ä»¶";
+				pc.Author = "å¤§çŸ³å¤´";
 				return pc;
 			}
 		}
 
 		#endregion
 
-		#region IDisposable ³ÉÔ±
+		#region IDisposable æˆå‘˜
 		/// <summary>
-		/// ÊÍ·Å×ÊÔ´
+		/// é‡Šæ”¾èµ„æº
 		/// </summary>
 		public override void Dispose()
 		{

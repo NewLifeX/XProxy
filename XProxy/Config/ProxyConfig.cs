@@ -14,11 +14,10 @@ namespace XProxy.Config
     public class ProxyConfig
     {
         #region 属性
-        private ListenerConfig[] _Listeners;
         /// <summary>
         /// 监听器集合
         /// </summary>
-        public ListenerConfig[] Listeners { get { return _Listeners; } set { _Listeners = value; } }
+        public ListenerConfig[] Listeners { get; set; }
         #endregion
 
         #region 构造函数

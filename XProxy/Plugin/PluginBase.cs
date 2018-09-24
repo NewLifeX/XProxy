@@ -93,12 +93,10 @@ namespace XProxy.Plugin
         {
             return Data;
         }
-
-        private PluginConfig _Config;
         /// <summary>
         /// 当前设置
         /// </summary>
-        public PluginConfig Config { get { return _Config; } set { _Config = value; } }
+        public PluginConfig Config { get; set; }
 
         /// <summary>
         /// 默认设置

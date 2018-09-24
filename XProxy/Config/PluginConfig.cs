@@ -1,160 +1,152 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+ï»¿using System;
 using System.ComponentModel;
-using System.Windows.Forms.Design;
-using System.Drawing.Design;
 using System.ComponentModel.Design;
-using System.Windows.Forms;
+using System.Text;
 using XProxy.Plugin;
 
 namespace XProxy.Config
 {
-	/// <summary>
-	/// ²å¼şÅäÖÃ
-	/// </summary>
-	[Serializable]
-	[Description("²å¼şÅäÖÃ")]
-	public class PluginConfig
-	{
-		private String _Name = "Î´ÃüÃû";
-		/// <summary>
-		/// ²å¼şÃû
-		/// </summary>
-		[ReadOnly(true)]
-		[Category("»ù±¾"), DefaultValue("Î´ÃüÃû²å¼ş"), Description("²å¼şÃû")]
-		public String Name { get { return _Name; } set { _Name = value; } }
+    /// <summary>
+    /// æ’ä»¶é…ç½®
+    /// </summary>
+    [Serializable]
+    [Description("æ’ä»¶é…ç½®")]
+    public class PluginConfig
+    {
+        /// <summary>
+        /// æ’ä»¶å
+        /// </summary>
+        [ReadOnly(true)]
+        [Category("åŸºæœ¬"), DefaultValue("æœªå‘½åæ’ä»¶"), Description("æ’ä»¶å")]
+        public String Name { get; set; } = "æœªå‘½å";
 
-		private String _Author;
-		/// <summary>
-		/// ²å¼ş×÷Õß
-		/// </summary>
-		[ReadOnly(true)]
-		[Category("»ù±¾"), DefaultValue("ÎŞÃû"), Description("²å¼ş×÷Õß")]
-		public String Author { get { return _Author; } set { _Author = value; } }
+        /// <summary>
+        /// æ’ä»¶ä½œè€…
+        /// </summary>
+        [ReadOnly(true)]
+        [Category("åŸºæœ¬"), DefaultValue("æ— å"), Description("æ’ä»¶ä½œè€…")]
+        public String Author { get; set; }
 
-		private String _Version;
-		/// <summary>
-		/// ²å¼ş°æ±¾
-		/// </summary>
-		[ReadOnly(true)]
-		[Category("»ù±¾"), Description("²å¼ş°æ±¾")]
-		public String Version { get { return _Version; } set { _Version = value; } }
+        /// <summary>
+        /// æ’ä»¶ç‰ˆæœ¬
+        /// </summary>
+        [ReadOnly(true)]
+        [Category("åŸºæœ¬"), Description("æ’ä»¶ç‰ˆæœ¬")]
+        public String Version { get; set; }
 
-		private String _Path;
-		/// <summary>
-		/// ²å¼şÂ·¾¶
-		/// </summary>
-		[ReadOnly(true)]
-		//[Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
-		[Category("ÅäÖÃ"), Description("²å¼şÂ·¾¶")]
-		public String Path { get { return _Path; } set { _Path = value; } }
+        /// <summary>
+        /// æ’ä»¶è·¯å¾„
+        /// </summary>
+        [ReadOnly(true)]
+        //[Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
+        [Category("é…ç½®"), Description("æ’ä»¶è·¯å¾„")]
+        public String Path { get; set; }
 
-		private String _ClassName;
-		/// <summary>
-		/// ÀàÃû
-		/// </summary>
-		[ReadOnly(true)]
-		[Category("ÅäÖÃ"), Description("ÀàÃû")]
-		public String ClassName { get { return _ClassName; } set { _ClassName = value; } }
+        /// <summary>
+        /// ç±»å
+        /// </summary>
+        [ReadOnly(true)]
+        [Category("é…ç½®"), Description("ç±»å")]
+        public String ClassName { get; set; }
 
-		private String _Extend;
-		/// <summary>
-		/// À©Õ¹ĞÅÏ¢1
-		/// </summary>
-		[Category("À©Õ¹"), Description("À©Õ¹ĞÅÏ¢")]
-		public String Extend { get { return _Extend; } set { _Extend = value; } }
+        /// <summary>
+        /// æ‰©å±•ä¿¡æ¯1
+        /// </summary>
+        [Category("æ‰©å±•"), Description("æ‰©å±•ä¿¡æ¯")]
+        public String Extend { get; set; }
+        /// <summary>
+        /// æ‰©å±•ä¿¡æ¯2
+        /// </summary>
+        [Category("æ‰©å±•"), Description("æ‰©å±•ä¿¡æ¯äºŒ")]
+        public String Extend2 { get; set; }
 
-		private String _Extend2;
-		/// <summary>
-		/// À©Õ¹ĞÅÏ¢2
-		/// </summary>
-		[Category("À©Õ¹"), Description("À©Õ¹ĞÅÏ¢¶ş")]
-		public String Extend2 { get { return _Extend2; } set { _Extend2 = value; } }
+        /// <summary>
+        /// å·²é‡è½½
+        /// </summary>
+        /// <returns></returns>
+        public override String ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append(Name);
+            if (!String.IsNullOrEmpty(Author)) sb.AppendFormat("ï¼ˆ{0}ï¼‰", Author);
+            if (!String.IsNullOrEmpty(ClassName)) sb.AppendFormat("ï¼Œ{0} V{1}", ClassName, Version);
+            if (!String.IsNullOrEmpty(Path)) sb.AppendFormat("ï¼Œ{0}", Path);
+            //sb.AppendFormat("{0}ï¼ˆ{1}ï¼‰ï¼Œ{2} {3}ï¼Œ{4}", Name, Author, ClassName, Version, Path);
+            return sb.ToString();
+        }
+    }
 
-		/// <summary>
-		/// ÒÑÖØÔØ
-		/// </summary>
-		/// <returns></returns>
-		public override String ToString()
-		{
-			var sb = new StringBuilder();
-			sb.Append(Name);
-			if (!String.IsNullOrEmpty(Author)) sb.AppendFormat("£¨{0}£©", Author);
-			if (!String.IsNullOrEmpty(ClassName)) sb.AppendFormat("£¬{0} V{1}", ClassName, Version);
-			if (!String.IsNullOrEmpty(Path)) sb.AppendFormat("£¬{0}", Path);
-			//sb.AppendFormat("{0}£¨{1}£©£¬{2} {3}£¬{4}", Name, Author, ClassName, Version, Path);
-			return sb.ToString();
-		}
-	}
+    /// <summary>
+    /// æ’ä»¶é›†åˆç¼–è¾‘å™¨
+    /// </summary>
+    public class PluginsEditor : ArrayEditor
+    {
+        /// <summary>
+        /// å·²é‡è½½
+        /// </summary>
+        /// <param name="type"></param>
+        public PluginsEditor(Type type)
+            : base(type)
+        {
+        }
 
-	/// <summary>
-	/// ²å¼ş¼¯ºÏ±à¼­Æ÷
-	/// </summary>
-	public class PluginsEditor : ArrayEditor
-	{
-		/// <summary>
-		/// ÒÑÖØÔØ
-		/// </summary>
-		/// <param name="type"></param>
-		public PluginsEditor(Type type)
-			: base(type)
-		{
-		}
+        /// <summary>
+        /// å·²é‡è½½
+        /// </summary>
+        /// <param name="itemType"></param>
+        /// <returns></returns>
+        protected override Object CreateInstance(Type itemType)
+        {
+            var form = new PluginSelectorForm
+            {
+                Plugins = PluginManager.AllPlugins
+            };
+            form.ShowDialog();
+            if (form.SelectedItem != null)
+            {
+                var pc = form.SelectedItem;
+                form.Dispose();
+                return pc;
+            }
+            form.Dispose();
+            return null;
+        }
+    }
 
-		/// <summary>
-		/// ÒÑÖØÔØ
-		/// </summary>
-		/// <param name="itemType"></param>
-		/// <returns></returns>
-		protected override Object CreateInstance(Type itemType)
-		{
-			var form = new PluginSelectorForm();
-			form.Plugins = PluginManager.AllPlugins;
-			form.ShowDialog();
-			if (form.SelectedItem != null)
-			{
-				var pc = form.SelectedItem;
-				form.Dispose();
-				return pc;
-			}
-			form.Dispose();
-			return null;
-		}
-	}
+    /// <summary>
+    /// Httpæ’ä»¶é›†åˆç¼–è¾‘å™¨
+    /// </summary>
+    public class HttpPluginsEditor : PluginsEditor
+    {
+        /// <summary>
+        /// å·²é‡è½½
+        /// </summary>
+        /// <param name="type"></param>
+        public HttpPluginsEditor(Type type)
+            : base(type)
+        {
+        }
 
-	/// <summary>
-	/// Http²å¼ş¼¯ºÏ±à¼­Æ÷
-	/// </summary>
-	public class HttpPluginsEditor : PluginsEditor
-	{
-		/// <summary>
-		/// ÒÑÖØÔØ
-		/// </summary>
-		/// <param name="type"></param>
-		public HttpPluginsEditor(Type type)
-			: base(type)
-		{
-		}
-
-		/// <summary>
-		/// ÒÑÖØÔØ
-		/// </summary>
-		/// <param name="itemType"></param>
-		/// <returns></returns>
-		protected override Object CreateInstance(Type itemType)
-		{
-			var form = new PluginSelectorForm();
-			form.Plugins = PluginManager.AllHttpPlugins;
-			form.ShowDialog();
-			if (form.SelectedItem != null)
-			{
-				var pc = form.SelectedItem;
-				form.Dispose();
-				return pc;
-			}
-			form.Dispose();
-			return null;
-		}
-	}
+        /// <summary>
+        /// å·²é‡è½½
+        /// </summary>
+        /// <param name="itemType"></param>
+        /// <returns></returns>
+        protected override Object CreateInstance(Type itemType)
+        {
+            var form = new PluginSelectorForm
+            {
+                Plugins = PluginManager.AllHttpPlugins
+            };
+            form.ShowDialog();
+            if (form.SelectedItem != null)
+            {
+                var pc = form.SelectedItem;
+                form.Dispose();
+                return pc;
+            }
+            form.Dispose();
+            return null;
+        }
+    }
 }

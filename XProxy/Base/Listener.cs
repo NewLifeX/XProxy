@@ -44,16 +44,10 @@ namespace XProxy.Base
                 return _Address;
             }
         }
-
-        private TcpListener _TcpServer;
         /// <summary>
         /// Tcp监听器
         /// </summary>
-        public TcpListener TcpServer
-        {
-            get { return _TcpServer; }
-            set { _TcpServer = value; }
-        }
+        public TcpListener TcpServer { get; set; }
 
         /// <summary>
         /// 客户端数组。用来记录所有已连接客户端。
@@ -64,13 +58,10 @@ namespace XProxy.Base
         /// 写日志委托
         /// </summary>
         public event WriteLogDelegate OnWriteLog;
-
-        private PluginManager _Plugin;
         /// <summary>
         /// 插件管理器
         /// </summary>
-        internal PluginManager Plugin
-        { get { return _Plugin; } set { _Plugin = value; } }
+        internal PluginManager Plugin { get; set; }
 
         private ListenerConfig _Config;
         /// <summary>

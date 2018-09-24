@@ -14,14 +14,12 @@ namespace XProxy.Config
 		{
 			InitializeComponent();
 		}
+        /// <summary>
+        /// 选择项
+        /// </summary>
+        public PluginConfig SelectedItem { get; set; }
 
-		private PluginConfig _SelectedItem;
-		/// <summary>
-		/// 选择项
-		/// </summary>
-		public PluginConfig SelectedItem { get { return _SelectedItem; } set { _SelectedItem = value; } }
-
-		private PluginConfig[] _Plugins;
+        private PluginConfig[] _Plugins;
 		/// <summary>
 		/// 插件集合
 		/// </summary>

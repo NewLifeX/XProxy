@@ -18,17 +18,15 @@ namespace XProxy.Http
         /// Http插件管理器
         /// </summary>
         public virtual HttpPlugin Manager { get { return _Manager; } set { _Manager = value; } }
+        /// <summary>
+        /// 当前设置
+        /// </summary>
+        public PluginConfig Config { get; set; }
 
-		private PluginConfig _Config;
-		/// <summary>
-		/// 当前设置
-		/// </summary>
-		public PluginConfig Config { get { return _Config; } set { _Config = value; } }
-
-		/// <summary>
-		/// 默认设置
-		/// </summary>
-		public virtual PluginConfig DefaultConfig
+        /// <summary>
+        /// 默认设置
+        /// </summary>
+        public virtual PluginConfig DefaultConfig
 		{
 			get
 			{
