@@ -35,13 +35,27 @@ namespace XProxy
         }
 
         #region 辅助
-        private void ShowAll()
+        private async Task ShowAll()
         {
+            await Task.Delay(500);
+
+            //XTrace.WriteLine("");
+            Console.WriteLine();
+
             var ps = ProxyHelper.GetAll();
             XTrace.WriteLine("共有代理提供者[{0}]：", ps.Length);
             foreach (var item in ps)
             {
                 XTrace.WriteLine("{0}\t{1}\t{2}", item.Name, item.GetDisplayName(), item.FullName);
+            }
+
+            Console.WriteLine();
+            var set = Setting.Current;
+            var xs = set.Items ?? new ProxyItem[0];
+            XTrace.WriteLine("共有代理配置[{0}]：", xs.Length);
+            foreach (var item in xs)
+            {
+                XTrace.WriteLine("{0}({1})\t{2}\t{3}=>{4}\t{5}", item.Name, item.Provider, item.Enable, item.Local, item.Remote, item.Value);
             }
         }
         #endregion

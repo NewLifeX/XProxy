@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
+using NewLife.Net.Proxy;
 using NewLife.Xml;
 
 namespace XProxy
@@ -39,15 +40,33 @@ namespace XProxy
                 {
                     if (!item.IsAbstract && item.GetGenericArguments().Length == 0)
                     {
-                        var p = item.FullName;
+                        var name = item.Name.TrimEnd("Proxy");
                         // 如果没有该类型的代理项，则增加一个
-                        if (!list.Any(e => e.Provider == p))
+                        if (!list.Any(e => e.Provider == name))
                         {
-                            list.Add(new ProxyItem
+                            var pi = new ProxyItem
                             {
-                                Name = item.Name.TrimEnd("Proxy"),
-                                Provider = p,
-                            });
+                                Name = name + "_Demo",
+                                Provider = name,
+                            };
+
+                            if (item == typeof(NATProxy))
+                            {
+                                pi.Local = "tcp://0.0.0.0:3388";
+                                pi.Remote = "tcp://localhost:3389";
+                            }
+                            else if (item == typeof(HttpReverseProxy))
+                            {
+                                pi.Local = "tcp://0.0.0.0:8081";
+                                pi.Remote = "tcp://www.newlifex.com:80";
+                            }
+                            else if (item == typeof(HttpProxy))
+                            {
+                                pi.Local = "tcp://0.0.0.0:1080";
+                                pi.Remote = "";
+                            }
+
+                            list.Add(pi);
                         }
                     }
                 }
@@ -109,7 +128,11 @@ namespace XProxy
 
         /// <summary>本地监听地址和端口</summary>
         [XmlAttribute]
-        public String Local { get; set; } = "0.0.0.0:80";
+        public String Local { get; set; } = "tcp://0.0.0.0:8080";
+
+        /// <summary>远程地址和端口</summary>
+        [XmlAttribute]
+        public String Remote { get; set; } = "tcp://www.newlifex.com:80";
 
         /// <summary>配置字符串</summary>
         [XmlAttribute]
