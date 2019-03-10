@@ -65,17 +65,21 @@
     <ApplicationIcon>leaf.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NewLife.Core, Version=7.3.6839.35284, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.Core.7.3.6839.35284\lib\net45\NewLife.Core.dll</HintPath>
+    <Reference Include="NewLife.Core, Version=8.1.7008.34076, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NewLife.Core.8.1.2019.310\lib\net45\NewLife.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NewLife.Net, Version=3.3.6841.16185, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.Net.3.3.6841.16185\lib\net45\NewLife.Net.dll</HintPath>
+    <Reference Include="NewLife.Net, Version=3.5.7008.39419, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NewLife.Net.3.5.2019.310\lib\net45\NewLife.Net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -140,10 +144,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Content Include="leaf.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="leaf.ico" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

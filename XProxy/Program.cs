@@ -8,6 +8,7 @@ using NewLife.Log;
 using NewLife.Net;
 using NewLife.Net.Proxy;
 using NewLife.Reflection;
+using NewLife.Threading;
 
 namespace XProxy
 {
@@ -26,8 +27,9 @@ namespace XProxy
             Task.Run(() => ShowAll());
         }
 
+        private TimerX _timer;
         private readonly IDictionary<String, ProxyBase> _ps = new Dictionary<String, ProxyBase>();
-        private void CheckProxy()
+        private void CheckProxy(Object state)
         {
             var set = Setting.Current;
             foreach (var item in set.Items)
@@ -56,13 +58,18 @@ namespace XProxy
 
         protected override void StartWork(String reason)
         {
-            CheckProxy();
+            //CheckProxy();
+            // 检查运行时新增代理配置
+            _timer = new TimerX(CheckProxy, null, 100, 10_000);
 
             base.StartWork(reason);
         }
 
         protected override void StopWork(String reason)
         {
+            _timer.TryDispose();
+            _timer = null;
+
             foreach (var item in _ps)
             {
                 item.Value.Stop(reason);
@@ -72,13 +79,13 @@ namespace XProxy
             base.StopWork(reason);
         }
 
-        public override Boolean Work(Int32 index)
-        {
-            // 检查运行时新增代理配置
-            if (index == 0) CheckProxy();
+        //public override Boolean Work(Int32 index)
+        //{
+        //    // 检查运行时新增代理配置
+        //    if (index == 0) CheckProxy();
 
-            return false;
-        }
+        //    return false;
+        //}
 
         #region 辅助
         private async Task ShowAll()
