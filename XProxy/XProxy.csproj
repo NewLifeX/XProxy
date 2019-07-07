@@ -1,160 +1,84 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E2BA9F2D-AE8E-40AD-A18D-CB99AF3EE765}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>XProxy</RootNamespace>
+    <TargetFrameworks>net45;netcoreapp2.1;net40</TargetFrameworks>
     <AssemblyName>XProxy</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <PublishUrl>http://localhost/XProxy/</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\Bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\Bin\</OutputPath>
+    <AssemblyTitle>新生命反向代理服务器</AssemblyTitle>
+    <Description>NAT反向代理，Http反向代理</Description>
+    <Company>新生命开发团队</Company>
+    <Copyright>版权所有(C) 新生命开发团队 2002~2019</Copyright>
+    <Version>3.0.2019.0707</Version>
+    <FileVersion>3.0.2019.0707</FileVersion>
+    <AssemblyVersion>3.0.*</AssemblyVersion>
+    <Deterministic>false</Deterministic>
+    <OutputPath>..\BinServer</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\生成\XProxy.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\BinServer</OutputPath>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>leaf.ico</ApplicationIcon>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\BinServer</OutputPath>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
+    <DefineConstants>$(DefineConstants);NETSTANDARD2_0;__CORE__</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
+    <DefineConstants>$(DefineConstants);__WIN__</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net40'">
+    <DefineConstants>$(DefineConstants);__WIN__;NET4</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="NewLife.Core, Version=8.1.7008.34076, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.Core.8.1.2019.310\lib\net45\NewLife.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="NewLife.Net, Version=3.5.7008.39419, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.Net.3.5.2019.310\lib\net45\NewLife.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Design" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Net.Http" />
+    <Compile Remove="Base\**" />
+    <Compile Remove="Config\**" />
+    <Compile Remove="Http\**" />
+    <Compile Remove="Plugin\**" />
+    <EmbeddedResource Remove="Base\**" />
+    <EmbeddedResource Remove="Config\**" />
+    <EmbeddedResource Remove="Http\**" />
+    <EmbeddedResource Remove="Plugin\**" />
+    <None Remove="Base\**" />
+    <None Remove="Config\**" />
+    <None Remove="Http\**" />
+    <None Remove="Plugin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ByteHelper.cs" />
+    <Compile Remove="NetData.cs" />
+    <Compile Remove="NetHelper.cs" />
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NewLife.Core" Version="8.2.2019.706" />
+    <PackageReference Include="NewLife.Net" Version="3.6.2019.707" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="NewLife.Agent">
+      <Version>8.2.2019.706</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net40'">
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Base\Connection.cs" />
-    <Compile Include="ByteHelper.cs" />
-    <Compile Include="Base\Session.cs" />
-    <Compile Include="Config\ListenerConfig.cs" />
-    <Compile Include="Config\PluginConfig.cs">
-    </Compile>
-    <Compile Include="Config\PluginSelectorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Config\PluginSelectorForm.Designer.cs">
-      <DependentUpon>PluginSelectorForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Config\ProxyConfig.cs" />
-    <Compile Include="Http\HttpHelper.cs" />
-    <Compile Include="Base\Listener.cs" />
-    <Compile Include="Http\HttpPluginBase.cs" />
-    <Compile Include="Http\HttpRequest.cs" />
-    <Compile Include="Http\HttpResponse.cs" />
-    <Compile Include="Http\Plugin\Direct.cs" />
-    <Compile Include="Http\Plugin\HttpCache.cs" />
-    <Compile Include="Http\Plugin\Indirect.cs" />
-    <Compile Include="Http\Plugin\Reverse.cs" />
-    <Compile Include="NetData.cs" />
-    <Compile Include="NetHelper.cs" />
-    <Compile Include="Http\HttpPlugin.cs" />
-    <Compile Include="Http\IHttpPlugin.cs" />
-    <Compile Include="Plugin\EncryptPlugin.cs" />
-    <Compile Include="Plugin\IPlugin.cs" />
-    <Compile Include="Plugin\NATPlugin.cs" />
-    <Compile Include="Plugin\PluginBase.cs" />
-    <Compile Include="Plugin\PluginManager.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProxyHelper.cs" />
-    <Compile Include="Setting.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Config\PluginSelectorForm.resx">
-      <DependentUpon>PluginSelectorForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="leaf.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="del &quot;$(TargetDir)*.xml&quot; /q" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

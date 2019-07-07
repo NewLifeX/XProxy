@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NewLife;
 using NewLife.Agent;
@@ -9,6 +10,9 @@ using NewLife.Net;
 using NewLife.Net.Proxy;
 using NewLife.Reflection;
 using NewLife.Threading;
+#if !NET4
+using TaskEx = System.Threading.Tasks.Task;
+#endif
 
 namespace XProxy
 {
@@ -24,7 +28,7 @@ namespace XProxy
             ServiceName = "XProxy";
             DisplayName = "XProxy代理服务器";
 
-            Task.Run(() => ShowAll());
+            TaskEx.Run(() => ShowAll());
         }
 
         private TimerX _timer;
@@ -90,7 +94,8 @@ namespace XProxy
         #region 辅助
         private async Task ShowAll()
         {
-            await Task.Delay(500);
+            //await Task.Delay(500);
+            Thread.Sleep(500);
 
             //XTrace.WriteLine("");
             Console.WriteLine();
