@@ -18,10 +18,10 @@ namespace XProxy
 {
     class Program
     {
-        static void Main(String[] args) => MyService.ServiceMain();
+        static void Main(String[] args) => new MyService().Main(args);
     }
 
-    class MyService : AgentServiceBase<MyService>
+    class MyService : ServiceBase
     {
         public MyService()
         {

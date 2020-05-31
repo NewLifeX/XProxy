@@ -2,26 +2,18 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net45;netcoreapp2.1;net40</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp3.1;net40</TargetFrameworks>
     <AssemblyName>XProxy</AssemblyName>
     <AssemblyTitle>新生命反向代理服务器</AssemblyTitle>
     <Description>NAT反向代理，Http反向代理</Description>
     <Company>新生命开发团队</Company>
-    <Copyright>版权所有(C) 新生命开发团队 2002~2019</Copyright>
-    <Version>3.0.2019.0707</Version>
-    <FileVersion>3.0.2019.0707</FileVersion>
+    <Copyright>版权所有(C) 新生命开发团队 2002~2020</Copyright>
+    <Version>3.0.2020.0601</Version>
+    <FileVersion>3.0.2020.0601</FileVersion>
     <AssemblyVersion>3.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\BinServer</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\BinServer</OutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\BinServer</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
@@ -63,18 +55,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.2.2019.706" />
-    <PackageReference Include="NewLife.Net" Version="3.6.2019.707" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="NewLife.Core" Version="8.7.2020.601" />
+    <PackageReference Include="NewLife.Net" Version="3.6.2020.601" />
     <PackageReference Include="NewLife.Agent">
-      <Version>8.2.2019.706</Version>
+      <Version>8.7.2020.601</Version>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net40'">
-    <Reference Include="System.ServiceProcess" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

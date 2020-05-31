@@ -13,7 +13,7 @@ namespace XProxy
         /// <returns></returns>
         public static Type[] GetAll()
         {
-            if (_proxyArray == null) _proxyArray = typeof(ProxyBase).GetAllSubclasses(true).ToArray();
+            if (_proxyArray == null) _proxyArray = typeof(ProxyBase).GetAllSubclasses().ToArray();
 
             return _proxyArray;
         }
