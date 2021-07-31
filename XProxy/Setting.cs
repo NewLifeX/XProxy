@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using NewLife;
 using NewLife.Net.Proxy;
+using NewLife.Reflection;
 using NewLife.Xml;
 
 namespace XProxy
@@ -38,18 +39,20 @@ namespace XProxy
 
                 var demo = list.Count == 0;
 
+                var idx = 1;
                 var arr = ProxyHelper.GetAll();
                 foreach (var item in arr)
                 {
                     if (!item.IsAbstract && item.GetGenericArguments().Length == 0)
                     {
-                        var name = item.Name.TrimEnd("Proxy");
+                        var pxy = item.CreateInstance() as ProxyBase;
+                        var name = pxy.Name.TrimEnd("Proxy");
                         // 如果没有该类型的代理项，则增加一个
                         if (!list.Any(e => e.Provider == name))
                         {
                             var pi = new ProxyItem
                             {
-                                Name = name + "_Demo",
+                                Name = "Demo" + idx++,
                                 Provider = name,
                             };
 

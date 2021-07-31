@@ -9,6 +9,7 @@ using NewLife.Log;
 using NewLife.Net;
 using NewLife.Net.Proxy;
 using NewLife.Reflection;
+using NewLife.Serialization;
 using NewLife.Threading;
 #if !NET4
 using TaskEx = System.Threading.Tasks.Task;
@@ -40,11 +41,20 @@ namespace XProxy
             {
                 if (item.Enable)
                 {
-                    if (!_ps.TryGetValue(item.Name, out var pi) && !item.Provider.IsNullOrEmpty())
+                    if (!_ps.ContainsKey(item.Name) && !item.Provider.IsNullOrEmpty())
                     {
-                        // 创建代理实例
-                        var proxy = CreateProxy(item, set.Debug);
-                        if (proxy != null) _ps.Add(item.Name, proxy);
+                        try
+                        {
+                            // 创建代理实例
+                            var proxy = CreateProxy(item, set.Debug);
+                            if (proxy != null) _ps.Add(item.Name, proxy);
+                        }
+                        catch (Exception ex)
+                        {
+                            XTrace.WriteException(ex);
+
+                            item.Enable = false;
+                        }
                     }
                 }
                 else
@@ -96,7 +106,8 @@ namespace XProxy
             XTrace.WriteLine("共有代理提供者[{0}]：", ps.Length);
             foreach (var item in ps)
             {
-                XTrace.WriteLine("{0}\t{1}\t{2}", item.Name, item.GetDisplayName(), item.FullName);
+                var pxy = item.CreateInstance() as ProxyBase;
+                XTrace.WriteLine("{0}\t{1}\t{2}", pxy.Name, item.GetDisplayName(), item.FullName);
             }
 
             Console.WriteLine();
@@ -105,7 +116,7 @@ namespace XProxy
             XTrace.WriteLine("共有代理配置[{0}]：", xs.Length);
             foreach (var item in xs)
             {
-                XTrace.WriteLine("{0}({1})\t{2}\t{3}=>{4}\t{5}", item.Name, item.Provider, item.Enable, item.Local, item.Remote, item.Value);
+                XTrace.WriteLine("{0}\t{1}\t{2}\t{3}=>{4}\t{5}", item.Name, item.Provider, item.Enable, item.Local, item.Remote, item.Value);
             }
         }
 
@@ -115,8 +126,9 @@ namespace XProxy
             var type = xs.FirstOrDefault(e => item.Provider.EqualIgnoreCase(e.Name, e.FullName, e.Name.TrimEnd("Proxy")));
             if (type == null) return null;
 
-            var proxy = type.CreateInstance() as ProxyBase;
-            if (proxy == null) return null;
+            if (type.CreateInstance() is not ProxyBase proxy) return null;
+
+            XTrace.WriteLine("创建代理 {0}", item.ToJson());
 
             // 配置本地、远程参数。高级参数直接修改这里，解析item.Value
             proxy.Local = new NetUri(item.Local);

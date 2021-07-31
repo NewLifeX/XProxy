@@ -25,7 +25,7 @@ namespace NewLife.Net.Proxy
         /// <summary>实例化</summary>
         public HttpReverseProxy()
         {
-            Name = "HttpRev";
+            Name = "HttpReverse";
 
             Port = 80;
             if (RemoteServer.Port == 0) RemoteServer.Port = 80;
