@@ -2,18 +2,19 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net45;netcoreapp3.1;net40</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp3.1;net5;net40</TargetFrameworks>
     <AssemblyName>XProxy</AssemblyName>
     <AssemblyTitle>新生命反向代理服务器</AssemblyTitle>
     <Description>NAT反向代理，Http反向代理</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2002~2020</Copyright>
-    <Version>3.0.2020.0601</Version>
-    <FileVersion>3.0.2020.0601</FileVersion>
+    <Version>3.1.2021.0731</Version>
+    <FileVersion>3.1.2021.0731</FileVersion>
     <AssemblyVersion>3.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\BinServer</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
@@ -35,30 +36,38 @@
   <ItemGroup>
     <Compile Remove="Base\**" />
     <Compile Remove="Config\**" />
-    <Compile Remove="Http\**" />
+    <Compile Remove="Http\Plugin\**" />
     <Compile Remove="Plugin\**" />
+    <Compile Remove="Proxy\Socks5\**" />
     <EmbeddedResource Remove="Base\**" />
     <EmbeddedResource Remove="Config\**" />
-    <EmbeddedResource Remove="Http\**" />
+    <EmbeddedResource Remove="Http\Plugin\**" />
     <EmbeddedResource Remove="Plugin\**" />
+    <EmbeddedResource Remove="Proxy\Socks5\**" />
     <None Remove="Base\**" />
     <None Remove="Config\**" />
-    <None Remove="Http\**" />
+    <None Remove="Http\Plugin\**" />
     <None Remove="Plugin\**" />
+    <None Remove="Proxy\Socks5\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="ByteHelper.cs" />
+    <Compile Remove="Http\HttpHelper.cs" />
+    <Compile Remove="Http\HttpPlugin.cs" />
+    <Compile Remove="Http\HttpPluginBase.cs" />
+    <Compile Remove="Http\HttpRequest.cs" />
+    <Compile Remove="Http\HttpResponse.cs" />
+    <Compile Remove="Http\IHttpPlugin.cs" />
     <Compile Remove="NetData.cs" />
     <Compile Remove="NetHelper.cs" />
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.7.2020.601" />
-    <PackageReference Include="NewLife.Net" Version="3.6.2020.601" />
+    <PackageReference Include="NewLife.Core" Version="8.10.2021.723-beta1" />
     <PackageReference Include="NewLife.Agent">
-      <Version>8.7.2020.601</Version>
+      <Version>8.7.2021.708</Version>
     </PackageReference>
   </ItemGroup>
 

@@ -64,7 +64,7 @@ namespace XProxy
         {
             //CheckProxy();
             // 检查运行时新增代理配置
-            _timer = new TimerX(CheckProxy, null, 100, 10_000);
+            _timer = new TimerX(CheckProxy, null, 100, 10_000) { Async = true };
 
             base.StartWork(reason);
         }
@@ -83,16 +83,8 @@ namespace XProxy
             base.StopWork(reason);
         }
 
-        //public override Boolean Work(Int32 index)
-        //{
-        //    // 检查运行时新增代理配置
-        //    if (index == 0) CheckProxy();
-
-        //    return false;
-        //}
-
         #region 辅助
-        private async Task ShowAll()
+        private void ShowAll()
         {
             //await Task.Delay(500);
             Thread.Sleep(500);
