@@ -128,6 +128,7 @@ namespace NewLife.Net.Proxy
                         var he = new HttpProxyEventArgs(Request, stream);
                         if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
                         //e.Stream = he.Stream;
+                        //todo 这里可以考虑 Packet.Slice
                         e.Packet = he.Stream.ReadBytes();
 
                         base.OnReceive(e);
@@ -157,6 +158,7 @@ namespace NewLife.Net.Proxy
                     var he = new HttpProxyEventArgs(Request, stream);
                     if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
                     //e.Stream = he.Stream;
+                    //todo 这里可以考虑 Packet.Slice
                     e.Packet = he.Stream.ReadBytes();
 
                     base.OnReceive(e);

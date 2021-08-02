@@ -8,9 +8,8 @@ namespace NewLife.Net.Http
     class HttpCache
     {
         #region 属性
-        private Int32 _Expriod = 600;
         /// <summary>过期时间。单位是秒，默认0秒，表示永不过期</summary>
-        public Int32 Expriod { get { return _Expriod; } set { _Expriod = value; } }
+        public Int32 Expriod { get; set; } = 600;
 
         private DictionaryCache<String, HttpCacheItem> _Items;
         /// <summary>缓存项</summary>
@@ -66,21 +65,18 @@ namespace NewLife.Net.Http
     class HttpCacheItem
     {
         #region 属性
-        private String _Url;
         /// <summary>网址</summary>
-        public String Url { get { return _Url; } set { _Url = value; } }
+        public String Url { get; set; }
 
-        private HttpHeader _Request;
         /// <summary>请求</summary>
-        public HttpHeader Request { get { return _Request; } set { _Request = value; } }
+        public HttpHeader Request { get; set; }
 
-        private HttpHeader _Response;
         /// <summary>响应</summary>
-        public HttpHeader Response { get { return _Response; } set { _Response = value; } }
+        public HttpHeader Response { get; set; }
 
         private Stream _Stream;
         /// <summary>数据流</summary>
-        public Stream Stream { get { return _Stream ?? (_Stream = new MemoryStream()); } set { _Stream = value; } }
+        public Stream Stream { get { return _Stream ??= new MemoryStream(); } set { _Stream = value; } }
 
         //private DateTime _StartTime = DateTime.Now;
         ///// <summary>开始时间</summary>
