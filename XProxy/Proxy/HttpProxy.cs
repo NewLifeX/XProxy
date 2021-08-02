@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using NewLife.Net.Http;
 
 namespace NewLife.Net.Proxy
@@ -90,11 +91,8 @@ namespace NewLife.Net.Proxy
         /// <summary>Http反向代理会话</summary>
         public class Session : ProxySession
         {
-            /// <summary>当前正在处理的请求。一个连接同时只能处理一个请求，除非是Http 1.2</summary>
-            HttpHeader _unFinishedRequest;
-
             /// <summary>已完成处理，正在转发数据的请求头</summary>
-            public HttpHeader Request;
+            public HttpHeader Request { get; set; }
 
             /// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
             /// <remarks>
@@ -104,132 +102,136 @@ namespace NewLife.Net.Proxy
             /// <param name="e"></param>
             protected override void OnReceive(ReceivedEventArgs e)
             {
-                if (e.Packet.Total == 0)
+                if (e.Packet.Total == 0 || !HttpBase.FastValidHeader(e.Packet))
                 {
                     base.OnReceive(e);
                     return;
                 }
 
-                var proxy = Host as HttpProxy;
-
-                #region 解析请求头
-                // 解析请求头。
-                var stream = e.Packet.GetStream() as Stream;
-                // 当前正在处理的未完整的头部，浏览器可能把请求头分成几块发过来
-                var entity = _unFinishedRequest;
-                // 如果当前请求为空，说明这是第一个数据包，可能包含头部
-                if (entity == null)
+                var request = new HttpRequest();
+                if (request.Parse(e.Packet))
                 {
-                    // 读取并分析头部
-                    entity = HttpHeader.Read(stream, HttpHeaderReadMode.Request);
-                    if (entity == null)
-                    {
-                        // 分析失败？这个可能不是Http请求头
-                        var he = new HttpProxyEventArgs(Request, stream);
-                        if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
-                        //e.Stream = he.Stream;
-                        //todo 这里可以考虑 Packet.Slice
-                        e.Packet = he.Stream.ReadBytes();
+                    WriteLog("{0}", request.Url);
 
-                        base.OnReceive(e);
+                    if (!OnRequest(request, e)) return;
 
-                        return;
-                    }
-
-                    // 根据完成情况保存到不同的本地变量中
-                    if (!entity.IsFinish)
-                        _unFinishedRequest = entity;
-                    else
-                        Request = entity;
-                }
-                else if (!entity.IsFinish)
-                {
-                    // 如果请求未完成，说明现在的数据内容还是头部
-                    entity.ReadHeaders(stream);
-                    if (entity.IsFinish)
-                    {
-                        Request = entity;
-                        _unFinishedRequest = null;
-                    }
-                }
-                else
-                {
-                    // 否则，头部已完成，现在就是内容，直接转发
-                    var he = new HttpProxyEventArgs(Request, stream);
-                    if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
-                    //e.Stream = he.Stream;
-                    //todo 这里可以考虑 Packet.Slice
-                    e.Packet = he.Stream.ReadBytes();
-
-                    base.OnReceive(e);
-
-                    return;
+                    e.Packet = request.Build();
                 }
 
-                // 请求头不完整，不发送，等下一部分到来
-                if (!entity.IsFinish) return;
-                #endregion
+                //var proxy = Host as HttpProxy;
 
-                WriteLog("{0}", entity.Url);
+                //#region 解析请求头
+                //// 解析请求头。
+                //var stream = e.Packet.GetStream() as Stream;
+                //// 当前正在处理的未完整的头部，浏览器可能把请求头分成几块发过来
+                //var entity = _unFinishedRequest;
+                //// 如果当前请求为空，说明这是第一个数据包，可能包含头部
+                //if (entity == null)
+                //{
+                //    // 读取并分析头部
+                //    entity = HttpHeader.Read(stream, HttpHeaderReadMode.Request);
+                //    if (entity == null)
+                //    {
+                //        // 分析失败？这个可能不是Http请求头
+                //        var he = new HttpProxyEventArgs(Request, stream);
+                //        if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
+                //        //e.Stream = he.Stream;
+                //        //todo 这里可以考虑 Packet.Slice
+                //        e.Packet = he.Stream.ReadBytes();
 
-                #region 重构请求包
-                // 现在所在位置是一个全新的请求
-                var rs = OnRequest(entity, e);
-                {
-                    var he = new HttpProxyEventArgs(Request, stream)
-                    {
-                        Cancel = !rs
-                    };
-                    rs = !proxy.RaiseEvent(this, EventKind.Request, he);
-                }
-                if (!rs) return;
+                //        base.OnReceive(e);
 
-                // 如果流中还有数据，可能是请求体，也要拷贝
-                if (stream.Position < stream.Length)
-                {
-                    var he = new HttpProxyEventArgs(Request, stream);
-                    if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
-                    stream = he.Stream;
-                }
+                //        return;
+                //    }
 
-                // 重新构造请求
-                var ms = new MemoryStream();
-                entity.Write(ms);
-                stream.CopyTo(ms);
-                ms.Position = 0;
+                //    // 根据完成情况保存到不同的本地变量中
+                //    if (!entity.IsFinish)
+                //        _unFinishedRequest = entity;
+                //    else
+                //        Request = entity;
+                //}
+                //else if (!entity.IsFinish)
+                //{
+                //    // 如果请求未完成，说明现在的数据内容还是头部
+                //    entity.ReadHeaders(stream);
+                //    if (entity.IsFinish)
+                //    {
+                //        Request = entity;
+                //        _unFinishedRequest = null;
+                //    }
+                //}
+                //else
+                //{
+                //    // 否则，头部已完成，现在就是内容，直接转发
+                //    var he = new HttpProxyEventArgs(Request, stream);
+                //    if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
+                //    //e.Stream = he.Stream;
+                //    //todo 这里可以考虑 Packet.Slice
+                //    e.Packet = he.Stream.ReadBytes();
 
-                //e.Stream = ms;
-                e.Packet = ms.ToArray();
-                #endregion
+                //    base.OnReceive(e);
+
+                //    return;
+                //}
+
+                //// 请求头不完整，不发送，等下一部分到来
+                //if (!entity.IsFinish) return;
+                //#endregion
+
+                //#region 重构请求包
+                //// 现在所在位置是一个全新的请求
+                //var rs = OnRequest(entity, e);
+                //{
+                //    var he = new HttpProxyEventArgs(Request, stream)
+                //    {
+                //        Cancel = !rs
+                //    };
+                //    rs = !proxy.RaiseEvent(this, EventKind.Request, he);
+                //}
+                //if (!rs) return;
+
+                //// 如果流中还有数据，可能是请求体，也要拷贝
+                //if (stream.Position < stream.Length)
+                //{
+                //    var he = new HttpProxyEventArgs(Request, stream);
+                //    if (proxy.RaiseEvent(this, EventKind.RequestBody, he)) return;
+                //    stream = he.Stream;
+                //}
+
+                //// 重新构造请求
+                //var ms = new MemoryStream();
+                //entity.Write(ms);
+                //stream.CopyTo(ms);
+                //ms.Position = 0;
+
+                ////e.Stream = ms;
+                //e.Packet = ms.ToArray();
+                //#endregion
 
                 base.OnReceive(e);
             }
 
-            /// <summary>是否保持连接</summary>
-            Boolean KeepAlive = false;
-            DateTime RequestTime;
-
             /// <summary>收到请求时</summary>
-            /// <param name="entity"></param>
+            /// <param name="request"></param>
             /// <param name="e"></param>
             /// <returns></returns>
-            protected virtual Boolean OnRequest(HttpHeader entity, ReceivedEventArgs e)
+            protected virtual Boolean OnRequest(HttpRequest request, ReceivedEventArgs e)
             {
-                var host = "";
-                var oriUrl = entity.Url;
-
                 // 特殊处理CONNECT
-                if (entity.Method.EqualIgnoreCase("CONNECT")) return ProcessConnect(entity, e);
+                if (request.Method.EqualIgnoreCase("CONNECT")) return ProcessConnect(request, e);
 
-                // 检查缓存
-                if (GetCache(entity, e)) return false;
+                //// 检查缓存
+                //if (GetCache(request, e)) return false;
 
                 var remote = RemoteServer;
                 var ruri = RemoteServerUri;
-                if (entity.Url.IsAbsoluteUri)
+                if (request.Url.IsAbsoluteUri)
                 {
-                    var uri = entity.Url;
-                    host = uri.Host + ":" + uri.Port;
+                    var uri = request.Url;
+                    var host = uri.Host + ":" + uri.Port;
+
+                    // 可能不含Host
+                    if (request.Host.IsNullOrEmpty()) request.Host = host;
 
                     // 如果地址或端口改变，则重新连接服务器
                     if (remote != null && (uri.Host != ruri.Host || uri.Port != ruri.Port))
@@ -243,45 +245,39 @@ namespace NewLife.Net.Proxy
                     //RemoteEndPoint = new IPEndPoint(NetHelper.ParseAddress(uri.Host), uri.Port);
                     ruri.Host = uri.Host;
                     ruri.Port = uri.Port;
-                    entity.Url = new Uri(uri.PathAndQuery, UriKind.Relative);
+                    request.Url = new Uri(uri.PathAndQuery, UriKind.Relative);
                 }
-                else if (!String.IsNullOrEmpty(entity.Host))
+                else if (!request.Host.IsNullOrEmpty())
                 {
                     //RemoteEndPoint = NetHelper.ParseEndPoint(entity.Host, 80);
-                    ruri.Host = entity.Host;
+                    ruri.Host = request.Host;
                     ruri.Port = 80;
                 }
                 else
-                    throw new XException("无法处理的请求！{0}", entity);
+                    throw new XException("无法处理的请求！{0}", request);
 
                 //WriteDebugLog("[{4}] {3} => {0} {1} [{2}]", entity.Method, oriUrl, entity.ContentLength, Session.Remote.EndPoint, ID);
 
-                // 可能不含Host
-                if (String.IsNullOrEmpty(entity.Host)) entity.Host = host;
-
                 // 处理KeepAlive
-                KeepAlive = false;
-                if (!String.IsNullOrEmpty(entity.ProxyConnection))
+                if (request.Headers.TryGetValue("Proxy-Connection", out var str))
                 {
-                    entity.KeepAlive = entity.ProxyKeepAlive;
-                    entity.ProxyConnection = null;
-
-                    KeepAlive = entity.ProxyKeepAlive;
+                    request.KeepAlive = str.EqualIgnoreCase("keep-alive");
+                    request.Headers.Remove("Proxy-Connection");
                 }
 
-                RequestTime = DateTime.Now;
+                //RequestTime = DateTime.Now;
 
                 return true;
             }
 
-            Boolean ProcessConnect(HttpHeader entity, ReceivedEventArgs e)
+            Boolean ProcessConnect(HttpRequest request, ReceivedEventArgs e)
             {
                 //WriteDebugLog("[{3}] {0} {1} [{2}]", entity.Method, entity.Url, entity.ContentLength, ID);
                 var pxy = Host as HttpProxy;
 
                 //var host = entity.Url.ToString();
                 var uri = RemoteServerUri;
-                var ep = NetHelper.ParseEndPoint(entity.Url.ToString(), 80);
+                var ep = NetHelper.ParseEndPoint(request.Url.ToString(), 80);
                 uri.EndPoint = ep;
 
                 // 不要连自己，避免死循环
@@ -293,26 +289,31 @@ namespace NewLife.Net.Proxy
                     return false;
                 }
 
-                var rs = new HttpHeader
-                {
-                    Version = entity.Version
-                };
+                var rs = new HttpResponse();
                 try
                 {
                     // 连接远程服务器，启动数据交换
                     if (RemoteServer == null) ConnectRemote(e);
 
-                    rs.StatusCode = 200;
+                    rs.StatusCode = HttpStatusCode.OK;
                     rs.StatusDescription = "OK";
                 }
+#if NET5_0
+                catch (HttpRequestException ex)
+                {
+                    rs.StatusCode = ex.StatusCode ?? HttpStatusCode.BadRequest;
+                    rs.StatusDescription = ex.Message;
+                }
+#endif
                 catch (Exception ex)
                 {
-                    rs.StatusCode = 500;
+                    rs.StatusCode = HttpStatusCode.BadGateway;
                     rs.StatusDescription = ex.Message;
                 }
 
                 // 告诉客户端，已经连上了服务端，或者没有连上，这里不需要向服务端发送任何数据
-                Send(rs.GetStream());
+                Send(rs.Build());
+
                 return false;
             }
 
@@ -457,10 +458,10 @@ namespace NewLife.Net.Proxy
                         stream = he.Stream;
                     }
 
-                    // 写入头部扩展
-                    entity.Headers["Powered-By-Proxy"] = pxy.Name;
-                    entity.Headers["RequestTime"] = RequestTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                    entity.Headers["TotalTime"] = (DateTime.Now - RequestTime).ToString();
+                    //// 写入头部扩展
+                    //entity.Headers["Powered-By-Proxy"] = pxy.Name;
+                    //entity.Headers["RequestTime"] = RequestTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                    //entity.Headers["TotalTime"] = (DateTime.Now - RequestTime).ToString();
                 }
 
                 #region 缓存
@@ -562,7 +563,7 @@ namespace NewLife.Net.Proxy
             protected override void OnRemoteDispose(ISocketClient session)
             {
                 // 如果客户端不要求保持连接，就销毁吧
-                if (!KeepAlive) base.OnRemoteDispose(session);
+                if (Request != null && !Request.KeepAlive) base.OnRemoteDispose(session);
             }
         }
         #endregion

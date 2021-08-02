@@ -1,13 +1,85 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Net;
+using NewLife.Collections;
 
-namespace XProxy.Http
+namespace NewLife.Net.Http
 {
-	/// <summary>
-	/// Http响应
-	/// </summary>
-	public class HttpResponse
-	{
-	}
+    /// <summary>Http响应</summary>
+    public class HttpResponse : HttpBase
+    {
+        #region 属性
+        ///// <summary>是否WebSocket</summary>
+        //public Boolean IsWebSocket { get; set; }
+
+        /// <summary>是否启用SSL</summary>
+        public Boolean IsSSL { get; set; }
+
+        /// <summary>状态码</summary>
+        public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
+
+        /// <summary>状态描述</summary>
+        public String StatusDescription { get; set; }
+        #endregion
+
+        /// <summary>分析第一行</summary>
+        /// <param name="firstLine"></param>
+        protected override Boolean OnParse(String firstLine)
+        {
+            if (firstLine.IsNullOrEmpty()) return false;
+
+            // HTTP/1.1 502 Bad Gateway
+            if (!firstLine.StartsWith("HTTP/")) return false;
+
+            var ss = firstLine.Split(" ");
+            //if (ss.Length < 3) throw new Exception("非法响应头 {0}".F(firstLine));
+            if (ss.Length < 3) return false;
+
+            Version = ss[0].TrimStart("HTTP/");
+
+            // 分析响应码
+            var code = ss[1].ToInt();
+            if (code > 0) StatusCode = (HttpStatusCode)code;
+
+            StatusDescription = ss.Skip(2).Join(" ");
+
+            return true;
+        }
+
+        /// <summary>创建头部</summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        protected override String BuildHeader(Int32 length)
+        {
+            // 构建头部
+            var sb = Pool.StringBuilder.Get();
+            sb.AppendFormat("HTTP/{2} {0} {1}\r\n", (Int32)StatusCode, StatusCode, Version);
+
+            //// cors
+            //sb.AppendFormat("Access-Control-Allow-Origin:{0}\r\n", "*");
+            //sb.AppendFormat("Access-Control-Allow-Methods:{0}\r\n", "POST, GET");
+            //sb.AppendFormat("Access-Control-Allow-Headers:{0}\r\n", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+            // 内容长度
+            if (length > 0) sb.AppendFormat("Content-Length:{0}\r\n", length);
+            if (!ContentType.IsNullOrEmpty()) sb.AppendFormat("Content-Type:{0}\r\n", ContentType);
+
+            foreach (var item in Headers)
+            {
+                sb.AppendFormat("{0}:{1}\r\n", item.Key, item.Value);
+            }
+
+            sb.AppendLine();
+
+            return sb.Put(true);
+        }
+
+        /// <summary>验证，如果失败则抛出异常</summary>
+        public void Valid()
+        {
+            if (StatusCode != HttpStatusCode.OK) throw new Exception(StatusDescription ?? (StatusCode + ""));
+        }
+
+        public override String ToString() => $"HTTP/{Version} {StatusCode} {StatusDescription}";
+    }
 }

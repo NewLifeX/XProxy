@@ -56,8 +56,6 @@
     <Compile Remove="Http\HttpHelper.cs" />
     <Compile Remove="Http\HttpPlugin.cs" />
     <Compile Remove="Http\HttpPluginBase.cs" />
-    <Compile Remove="Http\HttpRequest.cs" />
-    <Compile Remove="Http\HttpResponse.cs" />
     <Compile Remove="Http\IHttpPlugin.cs" />
     <Compile Remove="NetData.cs" />
     <Compile Remove="NetHelper.cs" />
