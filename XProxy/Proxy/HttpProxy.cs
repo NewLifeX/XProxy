@@ -109,13 +109,13 @@ namespace NewLife.Net.Proxy
             {
                 var pxy = Host as HttpProxy;
 
-                var uri = RemoteServerUri;
-                var ep = NetHelper.ParseEndPoint(request.Url.ToString(), 80);
-                uri.EndPoint = ep;
+                var uri = new NetUri(request.Url.ToString());
+                var ruri = RemoteServerUri;
+                ruri.Host = uri.Host;
+                ruri.Port = uri.Port;
 
                 // 不要连自己，避免死循环
-                if (ep.Port == pxy.Server.Port &&
-                    (ep.Address == IPAddress.Loopback || ep.Address == IPAddress.IPv6Loopback))
+                if (uri.Port == pxy.Server.Port && uri.Address.IsLocal())
                 {
                     WriteLog("不要连自己，避免死循环");
                     Dispose();

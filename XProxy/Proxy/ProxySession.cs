@@ -94,7 +94,7 @@ namespace NewLife.Net.Proxy
                 ISocketClient session = null;
                 try
                 {
-                    WriteDebugLog("连接远程服务器 {0} 解析 {1}", RemoteServerUri, RemoteServerUri.Address);
+                    //WriteDebugLog("连接远程服务器 {0} 解析 {1}", RemoteServerUri, RemoteServerUri.Address);
 
                     session = CreateRemote(e);
                     //session.Log = Log;
@@ -109,14 +109,15 @@ namespace NewLife.Net.Proxy
                     session.Received += Remote_Received;
                     session.Open();
 
-                    WriteDebugLog("连接远程服务器成功");
+                    //WriteDebugLog("连接远程服务器成功");
 
                     RemoteServer = session;
                 }
                 catch (Exception ex)
                 {
                     var ts = DateTime.Now - start;
-                    WriteError("无法为{0}连接远程服务器{1}！耗时{2}！{3}", Remote, RemoteServerUri, ts, ex.Message);
+                    //WriteError("无法为{0}连接远程服务器{1}！耗时{2}！{3}", Remote, RemoteServerUri, ts, ex.Message);
+                    WriteError(ex.Message);
 
                     if (session != null) session.Dispose();
                     Dispose();
@@ -217,12 +218,6 @@ namespace NewLife.Net.Proxy
             }
             set { _LogPrefix = value; }
         }
-
-        /// <summary>写调试版日志</summary>
-        /// <param name="format"></param>
-        /// <param name="args"></param>
-        [Conditional("DEBUG")]
-        protected void WriteDebugLog(String format, params Object[] args) => WriteLog(format, args);
 
         /// <summary>已重载。</summary>
         /// <returns></returns>
