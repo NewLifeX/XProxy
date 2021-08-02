@@ -9,15 +9,15 @@ namespace NewLife.Net.Proxy
     public abstract class ProxyBase : NetServer
     {
         #region 属性
-        /// <summary>开始会话时连接远程会话。默认true</summary>
-        public Boolean ConnectRemoteOnStart { get; set; } = true;
+        /// <summary>开始会话时连接远程会话。默认false</summary>
+        public Boolean ConnectRemoteOnStart { get; set; } 
         #endregion
 
         #region 构造函数
         /// <summary></summary>
         public ProxyBase()
         {
-            //必须要使UseSession = true，否则创建的session对象无Host属性，在ShowSession时，无法获取Host.Name
+            // 必须要使UseSession = true，否则创建的session对象无Host属性，在ShowSession时，无法获取Host.Name
             UseSession = true;
         }
         #endregion

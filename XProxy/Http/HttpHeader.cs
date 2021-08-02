@@ -334,41 +334,4 @@ namespace NewLife.Net.Http
         /// <summary>响应</summary>
         Response
     }
-
-    /// <summary>Http谓语</summary>
-    enum HttpVerb
-    {
-        /// <summary>未解析</summary>
-        Unparsed,
-
-        /// <summary>未知</summary>
-        Unknown,
-
-        /// <summary>获取</summary>
-        GET,
-
-        /// <summary>推送</summary>
-        PUT,
-
-        /// <summary>跟GET一样，只不过响应包只包括头部而没有内容</summary>
-        HEAD,
-
-        /// <summary>提交</summary>
-        POST,
-
-        /// <summary>调试</summary>
-        DEBUG,
-
-        /// <summary>跟踪</summary>
-        TRACE,
-
-        /// <summary>连接</summary>
-        CONNECT,
-
-        /// <summary>选项</summary>
-        OPTIONS,
-
-        /// <summary>删除</summary>
-        DELETE
-    }
 }

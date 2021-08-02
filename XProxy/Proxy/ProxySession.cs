@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using NewLife.Data;
 
 namespace NewLife.Net.Proxy
@@ -53,10 +51,11 @@ namespace NewLife.Net.Proxy
         {
             // 如果未指定远程协议，则与来源协议一致
             if (RemoteServerUri.Type == 0) RemoteServerUri.Type = Session.Local.Type;
-            // 如果是Tcp，收到空数据时不要断开。为了稳定可靠，默认设置
-            if (Session is TcpSession) (Session as TcpSession).DisconnectWhenEmptyData = false;
 
-            if (Host is ProxyBase proxy && proxy.ConnectRemoteOnStart) StartRemote(new ReceivedEventArgs());
+            // 如果是Tcp，收到空数据时不要断开。为了稳定可靠，默认设置
+            if (Session is TcpSession tcp) tcp.DisconnectWhenEmptyData = false;
+
+            if (Host is ProxyBase proxy && proxy.ConnectRemoteOnStart) ConnectRemote(null);
 
             base.Start();
         }
@@ -75,16 +74,16 @@ namespace NewLife.Net.Proxy
                 if (len > 0) WriteDebugLog("客户端", e.Packet);
 
                 // 如果未建立到远程服务器链接，则建立
-                if (RemoteServer == null) StartRemote(e);
+                if (RemoteServer == null) ConnectRemote(e);
 
                 // 如果已存在到远程服务器的链接，则把数据发向远程服务器
-                if (RemoteServer != null) SendRemote(e.Packet);
+                if (RemoteServer != null) SendToRemote(e.Packet);
             }
         }
 
         /// <summary>开始远程连接</summary>
         /// <param name="e"></param>
-        protected virtual void StartRemote(ReceivedEventArgs e)
+        protected virtual void ConnectRemote(ReceivedEventArgs e)
         {
             if (RemoteServer != null) return;
             lock (this)
@@ -103,7 +102,7 @@ namespace NewLife.Net.Proxy
                     session.Log = Session.Log;
                     session.OnDisposed += (s, e2) =>
                     {
-                        // 这个是必须清空的，是否需要保持会话呢，由OnRemoteDispose决定
+                        // 这个必须清空，是否需要保持会话由OnRemoteDispose决定
                         RemoteServer = null;
                         OnRemoteDispose(s as ISocketClient);
                     };
@@ -132,7 +131,7 @@ namespace NewLife.Net.Proxy
         {
             var client = RemoteServerUri.CreateRemote();
             // 如果是Tcp，收到空数据时不要断开。为了稳定可靠，默认设置
-            if (client is TcpSession) (client as TcpSession).DisconnectWhenEmptyData = false;
+            if (client is TcpSession tcp) tcp.DisconnectWhenEmptyData = false;
 
             return client;
         }
@@ -169,19 +168,7 @@ namespace NewLife.Net.Proxy
                 if (session == null || session.Disposed)
                     Dispose();
                 else
-                {
-                    try
-                    {
-                        Send(e.Packet);
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteError("转发给客户端出错，{0}", ex.Message);
-
-                        Dispose();
-                        throw;
-                    }
-                }
+                    Send(e.Packet);
             }
         }
         #endregion
@@ -189,43 +176,17 @@ namespace NewLife.Net.Proxy
         #region 发送
         /// <summary>发送数据</summary>
         /// <param name="pk">缓冲区</param>
-        public virtual Int32 SendRemote(Packet pk)
+        public virtual Int32 SendToRemote(Packet pk)
         {
             try
             {
                 return RemoteServer.Send(pk);
             }
-            catch { Dispose(); throw; }
-        }
-
-        /// <summary>发送数据流</summary>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-        public virtual Int32 SendRemote(Stream stream)
-        {
-            try
+            catch
             {
-                return RemoteServer.Send(stream);
-            }
-            catch (Exception ex)
-            {
-                WriteError("转发给服务端出错，{0}", ex.Message);
-
                 Dispose();
                 throw;
             }
-        }
-
-        /// <summary>发送字符串</summary>
-        /// <param name="msg"></param>
-        /// <param name="encoding"></param>
-        public virtual Int32 SendRemote(String msg, Encoding encoding = null)
-        {
-            try
-            {
-                return RemoteServer.Send(msg, encoding);
-            }
-            catch { Dispose(); throw; }
         }
         #endregion
 
@@ -262,12 +223,6 @@ namespace NewLife.Net.Proxy
         /// <param name="args"></param>
         [Conditional("DEBUG")]
         protected void WriteDebugLog(String format, params Object[] args) => WriteLog(format, args);
-
-        /// <summary>写调试版日志</summary>
-        /// <param name="action"></param>
-        /// <param name="stream"></param>
-        [Conditional("DEBUG")]
-        protected virtual void WriteDebugLog(String action, Stream stream) => WriteLog(action + "[{0}] {1}", stream.Length, stream.ReadBytes(16).ToHex());
 
         /// <summary>已重载。</summary>
         /// <returns></returns>

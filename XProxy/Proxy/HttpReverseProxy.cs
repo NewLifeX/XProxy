@@ -22,6 +22,9 @@ namespace NewLife.Net.Proxy
     /// </remarks>
     public class HttpReverseProxy : NATProxy
     {
+        /// <summary>请求时触发。</summary>
+        public event EventHandler<ReceivedEventArgs> OnRequest;
+
         /// <summary>实例化</summary>
         public HttpReverseProxy()
         {
@@ -42,9 +45,6 @@ namespace NewLife.Net.Proxy
         /// <summary>Http反向代理会话</summary>
         class Session : ProxySession
         {
-            ///// <summary>代理对象</summary>
-            //public new HttpReverseProxy Proxy { get { return base.Proxy as HttpReverseProxy; } set { base.Proxy = value; } }
-
             /// <summary>请求头部</summary>
             public HttpHeader Request { get; set; }
 
@@ -53,9 +53,6 @@ namespace NewLife.Net.Proxy
 
             /// <summary>原始主机</summary>
             public String RawHost { get; set; }
-
-            /// <summary>请求时触发。</summary>
-            public event EventHandler<ReceivedEventArgs> OnRequest;
 
             /// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
             /// <param name="e"></param>
@@ -73,10 +70,11 @@ namespace NewLife.Net.Proxy
                 WriteLog("{3}请求：{0} {1} [{2}]", entity.Method, entity.Url, entity.ContentLength, ID);
 
                 Request = entity;
-                OnRequest?.Invoke(this, e);
 
-                var pxy = Host as HttpReverseProxy;
-                var host = entity.Url.IsAbsoluteUri ? entity.Url.Host : pxy.RemoteServer.Host;
+                var proxy = Host as HttpReverseProxy;
+                proxy.OnRequest?.Invoke(this, e);
+
+                var host = entity.Url.IsAbsoluteUri ? entity.Url.Host : proxy.RemoteServer.Host;
                 RemoteHost = host;
                 RawHost = entity.Host;
                 entity.Host = host;
@@ -103,49 +101,9 @@ namespace NewLife.Net.Proxy
                 stream.CopyTo(ms);
                 ms.Position = 0;
 
-                //e.Stream = ms;
                 e.Packet = ms.ToArray();
 
                 base.OnReceive(e);
-            }
-
-            ///// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
-            ///// <param name="e"></param>
-            ///// <param name="stream">数据</param>
-            ///// <returns>修改后的数据</returns>
-            //protected override Stream OnReceiveRemote(NetEventArgs e, Stream stream)
-            //{
-            //    //var entity = HttpHeader.Read(stream, HttpHeaderReadMode.Response);
-            //    //if (entity == null) return base.OnReceive(e, stream);
-
-            //    var html = e.GetString();
-            //    html = html.Replace(Host, RawHost);
-            //    stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
-
-            //    return base.OnReceiveRemote(e, stream);
-            //}
-
-            /// <summary>写调试版日志</summary>
-            /// <param name="action"></param>
-            /// <param name="stream"></param>
-            protected override void WriteDebugLog(String action, Stream stream)
-            {
-                if (Log == null || !Log.Enable) return;
-
-                var p = stream.Position;
-                var str = stream.ReadBytes(5).ToStr();
-                stream.Position = p;
-                if (str.StartsWithIgnoreCase("HTTP/", "GET ", "POST "))
-                {
-                    // 只显示头部
-                    str = stream.ToStr().Substring(null, "\r\n\r\n").Trim();
-                    str = Environment.NewLine + str;
-                }
-                else
-                    str = stream.ReadBytes(16).ToHex();
-                stream.Position = p;
-
-                WriteLog(action + "[{0}] {1}", stream.Length, str);
             }
         }
         #endregion
