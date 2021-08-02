@@ -53,6 +53,7 @@
 
   <ItemGroup>
     <Compile Remove="ByteHelper.cs" />
+    <Compile Remove="Http\HttpCache.cs" />
     <Compile Remove="Http\HttpHelper.cs" />
     <Compile Remove="Http\HttpPlugin.cs" />
     <Compile Remove="Http\HttpPluginBase.cs" />

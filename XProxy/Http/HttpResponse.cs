@@ -80,6 +80,6 @@ namespace NewLife.Net.Http
             if (StatusCode != HttpStatusCode.OK) throw new Exception(StatusDescription ?? (StatusCode + ""));
         }
 
-        public override String ToString() => $"HTTP/{Version} {StatusCode} {StatusDescription}";
+        public override String ToString() => $"HTTP/{Version} {(Int32)StatusCode} {StatusDescription ?? (StatusCode + "")}";
     }
 }

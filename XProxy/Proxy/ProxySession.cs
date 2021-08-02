@@ -71,7 +71,7 @@ namespace NewLife.Net.Proxy
             var len = e.Packet.Total;
             if (len > 0 || len == 0 && ExchangeEmptyData)
             {
-                if (len > 0) WriteDebugLog("客户端", e.Packet);
+                //if (len > 0) WriteDebugLog("客户端", e.Packet);
 
                 // 如果未建立到远程服务器链接，则建立
                 if (RemoteServer == null) ConnectRemote(e);
@@ -160,7 +160,7 @@ namespace NewLife.Net.Proxy
         protected virtual void OnReceiveRemote(ReceivedEventArgs e)
         {
             var len = e.Packet.Total;
-            if (len > 0) WriteDebugLog("服务端", e.Packet);
+            //if (len > 0) WriteDebugLog("服务端", e.Packet);
 
             if (len > 0 || len == 0 && ExchangeEmptyData)
             {
