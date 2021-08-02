@@ -63,7 +63,7 @@ namespace NewLife.Net.Proxy
             /// <returns></returns>
             protected virtual Boolean OnRequest(HttpRequest request, ReceivedEventArgs e)
             {
-                // 特殊处理CONNECT
+                // https使用CONNECT建立连接
                 if (request.Method.EqualIgnoreCase("CONNECT")) return ProcessConnect(request, e);
 
                 var remote = RemoteServer;
