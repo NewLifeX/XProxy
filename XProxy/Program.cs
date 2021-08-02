@@ -59,7 +59,7 @@ namespace XProxy
                 }
                 else
                 {
-                    // 停止配置停用的服务
+                    // 停止配置为停用的服务
                     if (_ps.TryGetValue(item.Name, out var pi))
                     {
                         _ps.Remove(item.Name);
@@ -128,6 +128,7 @@ namespace XProxy
 
             if (type.CreateInstance() is not ProxyBase proxy) return null;
 
+            proxy.Name = item.Name;
             XTrace.WriteLine("创建代理 {0}", item.ToJson());
 
             // 配置本地、远程参数。高级参数直接修改这里，解析item.Value
