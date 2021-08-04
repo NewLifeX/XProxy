@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -79,7 +80,22 @@ namespace NewLife.Net.Proxy
 
         private class IpSession : Session
         {
+            private String[] _white_ips;
+            private String[] _black_ips;
+
             #region 方法
+            /// <summary>收到请求时</summary>
+            /// <param name="request"></param>
+            /// <param name="e"></param>
+            /// <returns></returns>
+            protected override Boolean OnRequest(HttpRequest request, ReceivedEventArgs e)
+            {
+                _white_ips = request.Headers["White-Ips"]?.Split(",");
+                _black_ips = request.Headers["Black-Ips"]?.Split(",");
+
+                return base.OnRequest(request, e);
+            }
+
             protected override ISocketClient CreateRemote(ReceivedEventArgs e)
             {
                 var client = base.CreateRemote(e);
@@ -89,8 +105,33 @@ namespace NewLife.Net.Proxy
                 var addrs = proxy.Addresses;
                 if (addrs != null && addrs.Length > 0)
                 {
-                    var n = Interlocked.Increment(ref proxy._index);
-                    client.Local.Address = addrs[(n - 1) % addrs.Length];
+                    IPAddress addr = null;
+
+                    // 指定了白名单，从中取IP
+                    if (_white_ips != null && _white_ips.Length > 0)
+                    {
+                        // 计算白名单中有效的IP地址
+                        var ds = addrs.Where(e => _white_ips.Contains(e + "")).ToArray();
+                        if (ds.Length > 0)
+                        {
+                            var n = Interlocked.Increment(ref proxy._index);
+                            addr = ds[(n - 1) % ds.Length];
+                        }
+                    }
+
+                    for (var i = 0; addr != null && i < 100; i++)
+                    {
+                        var n = Interlocked.Increment(ref proxy._index);
+                        var addr2 = addrs[(n - 1) % addrs.Length];
+
+                        if (_black_ips == null || !_black_ips.Contains(addr2 + ""))
+                        {
+                            addr = addr2;
+                            break;
+                        }
+                    }
+
+                    if (addr != null) client.Local.Address = addr;
                 }
 
                 return client;
