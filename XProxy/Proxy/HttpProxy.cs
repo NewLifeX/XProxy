@@ -132,6 +132,9 @@ namespace NewLife.Net.Proxy
                     // 连接远程服务器，启动数据交换
                     if (RemoteServer == null) ConnectRemote(e);
 
+                    // 响应头增加所使用的本地IP地址，让客户端知道
+                    rs.Headers["Local-Ip"] = RemoteServer.Local.Address + "";
+
                     rs.StatusCode = HttpStatusCode.OK;
                     rs.StatusDescription = "OK";
                 }
