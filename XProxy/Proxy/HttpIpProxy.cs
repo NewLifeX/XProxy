@@ -90,8 +90,8 @@ namespace NewLife.Net.Proxy
             /// <returns></returns>
             protected override Boolean OnRequest(HttpRequest request, ReceivedEventArgs e)
             {
-                _white_ips = request.Headers["White-Ips"]?.Split(",");
-                _black_ips = request.Headers["Black-Ips"]?.Split(",");
+                _white_ips = request.Headers["White-Ips"]?.Split(",").Where(e => !e.IsNullOrWhiteSpace()).Distinct().ToArray();
+                _black_ips = request.Headers["Black-Ips"]?.Split(",").Where(e => !e.IsNullOrWhiteSpace()).Distinct().ToArray();
 
                 return base.OnRequest(request, e);
             }
@@ -119,7 +119,7 @@ namespace NewLife.Net.Proxy
                         }
                     }
 
-                    for (var i = 0; addr != null && i < 100; i++)
+                    for (var i = 0; addr == null && i < addrs.Length; i++)
                     {
                         var n = Interlocked.Increment(ref proxy._index);
                         var addr2 = addrs[(n - 1) % addrs.Length];
