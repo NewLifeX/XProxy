@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using NewLife.Data;
 
 namespace NewLife.Net.Proxy
@@ -90,6 +89,8 @@ namespace NewLife.Net.Proxy
             {
                 if (RemoteServer != null) return;
 
+                using var span = Host.Tracer?.NewSpan("proxy:ConnectRemote", RemoteServerUri);
+
                 var start = DateTime.Now;
                 ISocketClient session = null;
                 try
@@ -165,6 +166,8 @@ namespace NewLife.Net.Proxy
 
             if (len > 0 || len == 0 && ExchangeEmptyData)
             {
+                using var span = Host.Tracer?.NewSpan("proxy:OnReceiveRemote", RemoteServerUri);
+
                 var session = Session;
                 if (session == null || session.Disposed)
                     Dispose();
@@ -179,12 +182,16 @@ namespace NewLife.Net.Proxy
         /// <param name="pk">缓冲区</param>
         public virtual Int32 SendToRemote(Packet pk)
         {
+            var client = RemoteServer;
+            using var span = Host.Tracer?.NewSpan($"proxy:SendToRemote:{client.Local.Address}", RemoteServerUri);
             try
             {
                 return RemoteServer.Send(pk);
             }
-            catch
+            catch (Exception ex)
             {
+                span?.SetError(ex, null);
+
                 Dispose();
                 throw;
             }

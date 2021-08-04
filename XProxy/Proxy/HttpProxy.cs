@@ -49,6 +49,8 @@ namespace NewLife.Net.Proxy
                 {
                     WriteLog("{0} {1}", request.Method, request.Url);
 
+                    using var span = Host.Tracer?.NewSpan("proxy:HttpProxyRequest", request.Url);
+
                     if (!OnRequest(request, e)) return;
 
                     e.Packet = request.Build();
@@ -107,6 +109,8 @@ namespace NewLife.Net.Proxy
 
             private Boolean ProcessConnect(HttpRequest request, ReceivedEventArgs e)
             {
+                using var span = Host.Tracer?.NewSpan("proxy:HttpProxyConnect", request.Url);
+
                 var pxy = Host as HttpProxy;
 
                 var uri = new NetUri(request.Url.ToString());

@@ -11,6 +11,7 @@ using NewLife.Net.Proxy;
 using NewLife.Reflection;
 using NewLife.Serialization;
 using NewLife.Threading;
+using Stardust;
 #if !NET4
 using TaskEx = System.Threading.Tasks.Task;
 #endif
@@ -64,14 +65,20 @@ namespace XProxy
                     {
                         _ps.Remove(item.Name);
 
+                        using var span = _tracer?.NewSpan("StopProxy", pi.Name);
+
                         pi.Stop("配置停用");
                     }
                 }
             }
         }
 
+        private ITracer _tracer;
         protected override void StartWork(String reason)
         {
+            var star = new StarFactory(null, null, null);
+            _tracer = star.Tracer;
+
             //CheckProxy();
             // 检查运行时新增代理配置
             _timer = new TimerX(CheckProxy, null, 100, 10_000) { Async = true };
@@ -128,7 +135,11 @@ namespace XProxy
 
             if (type.CreateInstance() is not ProxyBase proxy) return null;
 
+            using var span = _tracer?.NewSpan("CreateProxy", item);
+
             proxy.Name = item.Name;
+            proxy.Tracer = _tracer;
+
             XTrace.WriteLine("创建代理 {0}", item.ToJson());
 
             // 配置本地、远程参数。高级参数直接修改这里，解析item.Value
