@@ -61,8 +61,8 @@ namespace NewLife.Net.Http
             //sb.AppendFormat("Access-Control-Allow-Headers:{0}\r\n", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
             // 内容长度
-            if (length > 0) sb.AppendFormat("Content-Length:{0}\r\n", length);
-            if (!ContentType.IsNullOrEmpty()) sb.AppendFormat("Content-Type:{0}\r\n", ContentType);
+            if (length > 0) Headers["Content-Length"] = length + "";
+            if (!ContentType.IsNullOrEmpty()) Headers["Content-Type"] = ContentType;
 
             foreach (var item in Headers)
             {

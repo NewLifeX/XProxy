@@ -49,7 +49,7 @@ namespace NewLife.Net.Proxy
                 {
                     WriteLog("{0} {1}", request.Method, request.Url);
 
-                    using var span = Host.Tracer?.NewSpan("proxy:HttpProxyRequest", request.Url);
+                    using var span = Host.Tracer?.NewSpan("proxy:HttpProxyRequest", request.Url + "");
 
                     if (!OnRequest(request, e)) return;
 
@@ -109,7 +109,7 @@ namespace NewLife.Net.Proxy
 
             private Boolean ProcessConnect(HttpRequest request, ReceivedEventArgs e)
             {
-                using var span = Host.Tracer?.NewSpan("proxy:HttpProxyConnect", request.Url);
+                using var span = Host.Tracer?.NewSpan("proxy:HttpProxyConnect", request.Url + "");
 
                 var pxy = Host as HttpProxy;
 
@@ -154,10 +154,10 @@ namespace NewLife.Net.Proxy
                 return false;
             }
 
-            /// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
-            /// <param name="e"></param>
-            /// <returns>修改后的数据</returns>
-            protected override void OnReceiveRemote(ReceivedEventArgs e) => base.OnReceiveRemote(e);
+            ///// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
+            ///// <param name="e"></param>
+            ///// <returns>修改后的数据</returns>
+            //protected override void OnReceiveRemote(ReceivedEventArgs e) => base.OnReceiveRemote(e);
 
             /// <summary>远程连接断开时触发。默认销毁整个会话，子类可根据业务情况决定客户端与代理的链接是否重用。</summary>
             /// <param name="session"></param>

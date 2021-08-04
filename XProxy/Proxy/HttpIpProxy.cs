@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
+using NewLife.Net.Http;
 using NewLife.Threading;
 
 namespace NewLife.Net.Proxy
@@ -93,6 +94,22 @@ namespace NewLife.Net.Proxy
                 }
 
                 return client;
+            }
+
+            /// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
+            /// <param name="e"></param>
+            /// <returns>修改后的数据</returns>
+            protected override void OnReceiveRemote(ReceivedEventArgs e)
+            {
+                var response = new HttpResponse();
+                if (response.Parse(e.Packet))
+                {
+                    // 响应头增加所使用的本地IP地址，让客户端知道
+                    response.Headers["Local-Ip"] = RemoteServer.Local.Address + "";
+                    e.Packet = response.Build();
+                }
+
+                base.OnReceiveRemote(e);
             }
             #endregion
         }
