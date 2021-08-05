@@ -89,7 +89,7 @@ namespace NewLife.Net.Proxy
             {
                 if (RemoteServer != null) return;
 
-                using var span = Host.Tracer?.NewSpan("proxy:ConnectRemote", RemoteServerUri);
+                using var span = Host.Tracer?.NewSpan("proxy:ConnectRemote", RemoteServerUri + "");
 
                 var start = DateTime.Now;
                 ISocketClient session = null;
@@ -166,7 +166,7 @@ namespace NewLife.Net.Proxy
 
             if (len > 0 || len == 0 && ExchangeEmptyData)
             {
-                using var span = Host.Tracer?.NewSpan("proxy:OnReceiveRemote", RemoteServerUri);
+                using var span = Host.Tracer?.NewSpan("proxy:OnReceiveRemote", RemoteServerUri + "");
 
                 var session = Session;
                 if (session == null || session.Disposed)
@@ -183,7 +183,7 @@ namespace NewLife.Net.Proxy
         public virtual Int32 SendToRemote(Packet pk)
         {
             var client = RemoteServer;
-            using var span = Host.Tracer?.NewSpan($"proxy:SendToRemote:{client.Local.Address}", RemoteServerUri);
+            using var span = Host.Tracer?.NewSpan($"proxy:SendToRemote:{client.Local.Address}", RemoteServerUri + "");
             try
             {
                 return RemoteServer.Send(pk);

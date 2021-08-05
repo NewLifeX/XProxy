@@ -31,8 +31,16 @@ namespace Test
                 };
                 var client = new HttpClient(handler);
 
-                var html = client.GetStringAsync("http://star.newlifex.com/cube/info").Result;
-                XTrace.WriteLine(html);
+                var headers = client.DefaultRequestHeaders;
+                headers.Add("White-Ips", "10.0.0.1,10.0.0.2,10.0.0.3,10.0.0.3,");
+                headers.Add("Black-Ips", "10.0.0.4,10.0.0.5,10.0.0.8,10.0.0.6,");
+
+                //var html = client.GetStringAsync("http://star.newlifex.com/cube/info").Result;
+                //XTrace.WriteLine(html);
+
+                var rs = client.GetAsync("http://star.newlifex.com/cube/info").Result;
+
+                XTrace.WriteLine("Local-Ip: {0}", rs.Headers.GetValues("Local-Ip").Join());
             }
             catch (Exception ex)
             {
