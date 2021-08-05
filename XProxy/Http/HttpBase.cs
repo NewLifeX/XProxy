@@ -13,7 +13,7 @@ namespace NewLife.Net.Http
         public String Version { get; set; } = "1.1";
 
         /// <summary>内容长度</summary>
-        public Int32 ContentLength { get; set; }
+        public Int32 ContentLength { get; set; } = -1;
 
         /// <summary>内容类型</summary>
         public String ContentType { get; set; }
@@ -24,8 +24,8 @@ namespace NewLife.Net.Http
         /// <summary>主体长度</summary>
         public Int32 BodyLength => Body == null ? 0 : Body.Total;
 
-        /// <summary>是否已完整</summary>
-        public Boolean IsCompleted => ContentLength == 0 || ContentLength <= BodyLength;
+        /// <summary>是否已完整。头部未指定长度，或指定长度后内容已满足</summary>
+        public Boolean IsCompleted => ContentLength < 0 || ContentLength <= BodyLength;
 
         /// <summary>头部集合</summary>
         public IDictionary<String, String> Headers { get; set; } = new NullableDictionary<String, String>(StringComparer.OrdinalIgnoreCase);
@@ -37,7 +37,7 @@ namespace NewLife.Net.Http
         #endregion
 
         #region 解析
-        /// <summary>验证协议头</summary>
+        /// <summary>快速验证协议头，剔除非HTTP协议。仅排除，验证通过不一定就是HTTP协议</summary>
         /// <param name="pk"></param>
         /// <returns></returns>
         public static Boolean FastValidHeader(Packet pk)
@@ -74,15 +74,11 @@ namespace NewLife.Net.Http
                 if (p > 0) Headers[line.Substring(0, p)] = line.Substring(p + 1).Trim();
             }
 
-            ContentLength = Headers["Content-Length"].ToInt();
+            ContentLength = Headers["Content-Length"].ToInt(-1);
             ContentType = Headers["Content-Type"];
 
             // 分析第一行
             if (!OnParse(lines[0])) return false;
-
-            //// 判断主体长度
-            //BodyLength += pk.Count;
-            //if (ContentLength > 0 && BodyLength >= ContentLength) IsCompleted = true;
 
             return true;
         }
@@ -95,10 +91,10 @@ namespace NewLife.Net.Http
         #region 读写
         /// <summary>创建请求响应包</summary>
         /// <returns></returns>
-        public Packet Build()
+        public virtual Packet Build()
         {
             var data = Body;
-            var len = data != null ? data.Count : 0;
+            var len = data != null ? data.Count : -1;
 
             var header = BuildHeader(len);
             var rs = new Packet(header.GetBytes())
