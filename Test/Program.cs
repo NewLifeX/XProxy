@@ -12,10 +12,23 @@ namespace Test
         {
             XTrace.UseConsole();
 
+            AppContext.SetSwitch("System.Net.Http.UseSocketsHttpHandler", true);
+
             try
             {
-                var proxy = new MyProxy("http://127.0.0.1:8080", null, null);
-                var handler = new HttpClientHandler { Proxy = proxy };
+                var proxy = new WebProxy("10.0.0.3:8080")
+                {
+                    Credentials = new NetworkCredential("stone", "password"),
+                    //BypassProxyOnLocal = false,
+                    //UseDefaultCredentials = false,
+                };
+                var handler = new HttpClientHandler
+                {
+                    Proxy = proxy,
+                    UseProxy = true,
+                    PreAuthenticate = true,
+                    UseDefaultCredentials = false,
+                };
                 var client = new HttpClient(handler);
 
                 var html = client.GetStringAsync("http://star.newlifex.com/cube/info").Result;
@@ -29,23 +42,21 @@ namespace Test
             Console.WriteLine("Hello World!");
             Console.ReadLine();
         }
-    }
 
-    public class MyProxy : IWebProxy
-    {
-        public Uri ProxyUri { get; set; }
-
-        public ICredentials Credentials { get; set; }
-
-        public MyProxy(String proxyUri, String username, String password)
+        public class MyProxy : IWebProxy
         {
-            ProxyUri = new Uri(proxyUri);
+            public Uri ProxyUri { get; set; }
 
-            if (!username.IsNullOrEmpty()) Credentials = new NetworkCredential(username, password);
+            public ICredentials Credentials { get; set; }
+
+            public MyProxy(String proxyUri)
+            {
+                ProxyUri = new Uri(proxyUri);
+            }
+
+            public Uri GetProxy(Uri destination) => ProxyUri;
+
+            public Boolean IsBypassed(Uri host) => false;
         }
-
-        public Uri GetProxy(Uri destination) => ProxyUri;
-
-        public Boolean IsBypassed(Uri host) => false;
     }
 }
