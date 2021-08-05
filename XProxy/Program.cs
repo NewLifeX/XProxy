@@ -123,7 +123,7 @@ namespace XProxy
             XTrace.WriteLine("共有代理配置[{0}]：", xs.Length);
             foreach (var item in xs)
             {
-                XTrace.WriteLine("{0}\t{1}\t{2}\t{3}=>{4}\t{5}", item.Name, item.Provider, item.Enable, item.Local, item.Remote, item.Value);
+                XTrace.WriteLine("{0}\t{1}\t{2}\t{3}=>{4}\t{5}", item.Name, item.Provider, item.Enable, item.Local, item.Remote, item.Config);
             }
         }
 
@@ -141,6 +141,8 @@ namespace XProxy
             proxy.Tracer = _tracer;
 
             XTrace.WriteLine("创建代理 {0}", item.ToJson());
+
+            proxy.Init(item.Config);
 
             // 配置本地、远程参数。高级参数直接修改这里，解析item.Value
             proxy.Local = new NetUri(item.Local);

@@ -10,7 +10,7 @@ namespace NewLife.Net.Proxy
     {
         #region 属性
         /// <summary>开始会话时连接远程会话。默认false</summary>
-        public Boolean ConnectRemoteOnStart { get; set; } 
+        public Boolean ConnectRemoteOnStart { get; set; }
         #endregion
 
         #region 构造函数
@@ -23,6 +23,10 @@ namespace NewLife.Net.Proxy
         #endregion
 
         #region 业务
+        /// <summary>初始化配置</summary>
+        /// <param name="config"></param>
+        public virtual void Init(String config) { }
+
         /// <summary>创建会话</summary>
         /// <param name="session"></param>
         /// <returns></returns>

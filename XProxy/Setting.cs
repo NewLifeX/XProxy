@@ -70,6 +70,7 @@ namespace XProxy
                             {
                                 pi.Local = "tcp://0.0.0.0:1080";
                                 pi.Remote = "";
+                                pi.Config = "user=;pass=newlife;realm=Access to NewLife-HttpProxy";
                             }
 
                             // 演示模式时，默认开启所有代理
@@ -145,6 +146,6 @@ namespace XProxy
 
         /// <summary>配置字符串</summary>
         [XmlAttribute]
-        public String Value { get; set; }
+        public String Config { get; set; }
     }
 }
