@@ -9,12 +9,36 @@ namespace NewLife.Net.Proxy
     /// <remarks>Http代理请求与普通请求唯一的不同就是Uri，Http代理请求收到的是可能包括主机名的完整Uri</remarks>
     public class HttpProxy : ProxyBase
     {
+        #region 属性
+        /// <summary>代理用户名</summary>
+        public String Username { get; set; }
+
+        /// <summary>代理密码</summary>
+        public String Password { get; set; }
+
+        /// <summary>对于被保护区域（即安全域）的描述。如果没有指定安全域，客户端通常用一个格式化的主机名来代替。</summary>
+        public String Realm { get; set; }
+        #endregion
+
         #region 构造
         /// <summary>实例化</summary>
         public HttpProxy()
         {
             Port = 8080;
             ProtocolType = NetType.Tcp;
+        }
+        #endregion
+
+        #region 方法
+        public override void Init(String config)
+        {
+            var dic = config?.SplitAsDictionary("=", ";");
+            if (dic != null && dic.Count > 0)
+            {
+                Username = dic["user"];
+                Password = dic["pass"];
+                Realm = dic["realm"];
+            }
         }
         #endregion
 
@@ -29,6 +53,9 @@ namespace NewLife.Net.Proxy
         {
             /// <summary>已完成处理，正在转发数据的请求头</summary>
             public HttpHeader Request { get; set; }
+
+            /// <summary>已认证</summary>
+            public Boolean Authenticated { get; set; }
 
             /// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
             /// <remarks>
@@ -65,6 +92,11 @@ namespace NewLife.Net.Proxy
             /// <returns></returns>
             protected virtual Boolean OnRequest(HttpRequest request, ReceivedEventArgs e)
             {
+                var proxy = (this as INetSession).Host as HttpProxy;
+
+                // 代理认证
+                if (!proxy.Username.IsNullOrEmpty() && !OnAuthenticate(request)) return false;
+
                 // https使用CONNECT建立连接
                 if (request.Method.EqualIgnoreCase("CONNECT")) return ProcessConnect(request, e);
 
@@ -107,6 +139,51 @@ namespace NewLife.Net.Proxy
                 return true;
             }
 
+            /// <summary>代理认证</summary>
+            /// <param name="request"></param>
+            /// <returns></returns>
+            protected virtual Boolean OnAuthenticate(HttpRequest request)
+            {
+                if (Authenticated) return true;
+
+                var proxy = (this as INetSession).Host as HttpProxy;
+
+                var token = request.Headers["Proxy-Authorization"];
+                if (!token.IsNullOrEmpty() && token.StartsWithIgnoreCase("Basic "))
+                {
+                    token = token.Substring("Basic ".Length);
+                    token = token.ToBase64().ToStr();
+
+                    var p = token.IndexOf(':');
+                    if (p > 0 && p < token.Length - 1)
+                    {
+                        var user = token.Substring(0, p);
+                        var pass = token.Substring(p + 1);
+                        if (user == proxy.Username && pass == proxy.Password)
+                        {
+                            Authenticated = true;
+                        }
+                    }
+                }
+
+                if (!Authenticated)
+                {
+                    var rs = new HttpResponse
+                    {
+                        Version = request.Version,
+                        StatusCode = HttpStatusCode.ProxyAuthenticationRequired,
+                    };
+
+                    rs.Headers["Proxy-Authenticate"] = $"Basic realm=\"{proxy.Realm}\"";
+
+                    Send(rs.Build());
+
+                    return false;
+                }
+
+                return true;
+            }
+
             private Boolean ProcessConnect(HttpRequest request, ReceivedEventArgs e)
             {
                 using var span = Host.Tracer?.NewSpan("proxy:HttpProxyConnect", request.Url + "");
@@ -133,7 +210,7 @@ namespace NewLife.Net.Proxy
                     if (RemoteServer == null) ConnectRemote(e);
 
                     // 响应头增加所使用的本地IP地址，让客户端知道
-                    rs.Headers["Local-Ip"] = RemoteServer.Local.Address + "";
+                    rs.Headers["Local-Ip"] = RemoteServer?.Local.Address + "";
 
                     rs.StatusCode = HttpStatusCode.OK;
                     rs.StatusDescription = "OK";
