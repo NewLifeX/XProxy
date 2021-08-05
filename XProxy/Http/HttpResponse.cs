@@ -1,7 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using NewLife.Collections;
+using NewLife.Data;
+using NewLife.Remoting;
+using NewLife.Serialization;
 
 namespace NewLife.Net.Http
 {
@@ -9,12 +13,6 @@ namespace NewLife.Net.Http
     public class HttpResponse : HttpBase
     {
         #region 属性
-        ///// <summary>是否WebSocket</summary>
-        //public Boolean IsWebSocket { get; set; }
-
-        /// <summary>是否启用SSL</summary>
-        public Boolean IsSSL { get; set; }
-
         /// <summary>状态码</summary>
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
 
@@ -46,6 +44,19 @@ namespace NewLife.Net.Http
             return true;
         }
 
+        /// <summary>创建请求响应包</summary>
+        /// <returns></returns>
+        public override Packet Build()
+        {
+            // 如果响应异常，则使用响应描述作为内容
+            if (StatusCode > HttpStatusCode.OK && Body == null && !StatusDescription.IsNullOrEmpty())
+            {
+                Body = StatusDescription.GetBytes();
+            }
+
+            return base.Build();
+        }
+
         /// <summary>创建头部</summary>
         /// <param name="length"></param>
         /// <returns></returns>
@@ -61,7 +72,11 @@ namespace NewLife.Net.Http
             //sb.AppendFormat("Access-Control-Allow-Headers:{0}\r\n", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
             // 内容长度
-            if (length > 0) Headers["Content-Length"] = length + "";
+            if (length > 0)
+                Headers["Content-Length"] = length + "";
+            else if (!Headers.ContainsKey("Transfer-Encoding"))
+                Headers["Content-Length"] = "0";
+
             if (!ContentType.IsNullOrEmpty()) Headers["Content-Type"] = ContentType;
 
             foreach (var item in Headers)
@@ -80,6 +95,51 @@ namespace NewLife.Net.Http
             if (StatusCode != HttpStatusCode.OK) throw new Exception(StatusDescription ?? (StatusCode + ""));
         }
 
+        /// <summary>设置结果，影响Body和ContentType</summary>
+        /// <param name="result"></param>
+        /// <param name="contentType"></param>
+        public void SetResult(Object result, String contentType = null)
+        {
+            if (result == null) return;
+
+            if (result is Exception ex)
+            {
+                if (ex is ApiException aex)
+                    StatusCode = (HttpStatusCode)aex.Code;
+                else
+                    StatusCode = HttpStatusCode.InternalServerError;
+
+                StatusDescription = ex.Message;
+            }
+            else if (result is Packet pk)
+            {
+                ContentType = contentType ?? "application/octet-stream";
+                Body = pk;
+            }
+            else if (result is Byte[] buffer)
+            {
+                ContentType = contentType ?? "application/octet-stream";
+                Body = buffer;
+            }
+            else if (result is Stream stream)
+            {
+                ContentType = contentType ?? "application/octet-stream";
+                Body = stream.ReadBytes();
+            }
+            else if (result is String str)
+            {
+                ContentType = contentType ?? "text/html";
+                Body = str.GetBytes();
+            }
+            else
+            {
+                ContentType = contentType ?? "application/json";
+                Body = result.ToJson().GetBytes();
+            }
+        }
+
+        /// <summary>已重载。</summary>
+        /// <returns></returns>
         public override String ToString() => $"HTTP/{Version} {(Int32)StatusCode} {StatusDescription ?? (StatusCode + "")}";
     }
 }

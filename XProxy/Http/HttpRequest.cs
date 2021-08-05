@@ -17,23 +17,8 @@ namespace NewLife.Net.Http
         /// <summary>目标主机</summary>
         public String Host { get; set; }
 
-        ///// <summary>用户代理</summary>
-        //public String UserAgent { get; set; }
-
-        ///// <summary>是否压缩</summary>
-        //public Boolean Compressed { get; set; }
-
         /// <summary>保持连接</summary>
         public Boolean KeepAlive { get; set; }
-
-        ///// <summary>可接受内容</summary>
-        //public String Accept { get; set; }
-
-        ///// <summary>接受语言</summary>
-        //public String AcceptLanguage { get; set; }
-
-        ///// <summary>引用路径</summary>
-        //public String Referer { get; set; }
         #endregion
 
         /// <summary>分析第一行</summary>
@@ -49,31 +34,12 @@ namespace NewLife.Net.Http
             if (ss.Length >= 3 && ss[2].StartsWithIgnoreCase("HTTP/"))
             {
                 Method = ss[0];
-
-                //// 构造资源路径
-                //var p = ss[1].IndexOf("://");
-                //if (p > 0)
-                //{
                 Url = new Uri(ss[1], UriKind.RelativeOrAbsolute);
-                //}
-                //else
-                //{
-                //    var sch = !Headers["Sec-WebSocket-Key"].IsNullOrEmpty() ? "ws" : "http";
-                //    var host = Headers["Host"];
-                //    var uri = $"{sch}://{host}";
-                //    uri += ss[1];
-                //    Url = new Uri(uri);
-                //}
                 Version = ss[2].TrimStart("HTTP/");
             }
 
             Host = Headers["Host"];
-            //UserAgent = Headers["User-Agent"];
-            //Compressed = Headers["Accept-Encoding"].Contains("deflate");
             KeepAlive = Headers["Connection"].EqualIgnoreCase("keep-alive");
-            //Accept = Headers["Accept"];
-            //AcceptLanguage = Headers["Accept-Language"];
-            //Referer = Headers["Referer"];
 
             return true;
         }
@@ -135,17 +101,11 @@ namespace NewLife.Net.Http
             sb.AppendFormat("{0} {1} HTTP/{2}\r\n", Method, uri, Version);
             sb.AppendFormat("Host:{0}\r\n", Host);
 
-            //if (!Accept.IsNullOrEmpty()) Headers["Accept"] = Accept;
-            //if (Compressed) Headers["Accept-Encoding"] = "gzip, deflate";
-            //if (!AcceptLanguage.IsNullOrEmpty()) Headers["Accept-Language"] = AcceptLanguage;
-            //if (!UserAgent.IsNullOrEmpty()) Headers["User-Agent"] = UserAgent;
-
             // 内容长度
             if (length > 0) Headers["Content-Length"] = length + "";
             if (!ContentType.IsNullOrEmpty()) Headers["Content-Type"] = ContentType;
 
             if (KeepAlive) Headers["Connection"] = "keep-alive";
-            //if (!Referer.IsNullOrEmpty()) Headers["Referer"] = Referer;
 
             foreach (var item in Headers)
             {
@@ -158,6 +118,8 @@ namespace NewLife.Net.Http
             return sb.Put(true);
         }
 
+        /// <summary>已重载。</summary>
+        /// <returns></returns>
         public override String ToString() => $"{Method} {Url}";
     }
 }
