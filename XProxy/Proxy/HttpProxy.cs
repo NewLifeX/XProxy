@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using NewLife.Net.Http;
@@ -136,6 +137,13 @@ namespace NewLife.Net.Proxy
                     request.Headers.Remove("Proxy-Connection");
                 }
 
+                // 移除所有代理专用头部字段，避免传递给网站服务器
+                var keys = request.Headers.Where(e => e.Key.StartsWithIgnoreCase("proxy-")).ToArray();
+                foreach (var item in keys)
+                {
+                    request.Headers.Remove(item);
+                }
+
                 return true;
             }
 
@@ -210,7 +218,7 @@ namespace NewLife.Net.Proxy
                     if (RemoteServer == null) ConnectRemote(e);
 
                     // 响应头增加所使用的本地IP地址，让客户端知道
-                    rs.Headers["Local-Ip"] = RemoteServer?.Local.Address + "";
+                    rs.Headers["Proxy-Local-Ip"] = RemoteServer?.Local.Address + "";
 
                     rs.StatusCode = HttpStatusCode.OK;
                     rs.StatusDescription = "OK";
@@ -233,11 +241,6 @@ namespace NewLife.Net.Proxy
 
                 return false;
             }
-
-            ///// <summary>收到客户端发来的数据。子类可通过重载该方法来修改数据</summary>
-            ///// <param name="e"></param>
-            ///// <returns>修改后的数据</returns>
-            //protected override void OnReceiveRemote(ReceivedEventArgs e) => base.OnReceiveRemote(e);
 
             /// <summary>远程连接断开时触发。默认销毁整个会话，子类可根据业务情况决定客户端与代理的链接是否重用。</summary>
             /// <param name="session"></param>
