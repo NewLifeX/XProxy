@@ -77,7 +77,7 @@ namespace XProxy
         protected override void StartWork(String reason)
         {
             var star = new StarFactory(null, null, null);
-            _tracer = star.Tracer;
+            if (!star.Server.IsNullOrEmpty()) _tracer = star.Tracer;
 
             //CheckProxy();
             // 检查运行时新增代理配置
