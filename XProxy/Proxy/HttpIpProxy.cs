@@ -113,11 +113,23 @@ namespace NewLife.Net.Proxy
                     {
                         // 计算白名单中有效的IP地址
                         var ds = addrs.Where(e => _white_ips.Contains(e + "")).ToArray();
-                        if (ds.Length > 0)
+                        for (var i = 0; i < ds.Length; i++)
                         {
                             var n = Interlocked.Increment(ref proxy._index) - 1;
-                            addr = ds[n % ds.Length];
-                            _policy = $"{n}#_white_ips";
+                            var addr2 = ds[n % ds.Length];
+
+                            if (_black_ips == null)
+                            {
+                                addr = addr2;
+                                _policy = $"{n}#_white_ips";
+                                break;
+                            }
+                            if (!_black_ips.Contains(addr2 + ""))
+                            {
+                                addr = addr2;
+                                _policy = $"{n}#_white_ips#not_in_black_ips";
+                                break;
+                            }
                         }
                     }
 
@@ -135,7 +147,7 @@ namespace NewLife.Net.Proxy
                         if (!_black_ips.Contains(addr2 + ""))
                         {
                             addr = addr2;
-                            _policy = $"{n}#_black_ips";
+                            _policy = $"{n}#normal#not_in_black_ips";
                             break;
                         }
                     }
