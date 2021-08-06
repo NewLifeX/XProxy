@@ -74,7 +74,7 @@ namespace NewLife.Net.Proxy
                 var request = new HttpRequest();
                 if (request.Parse(e.Packet))
                 {
-                    WriteLog("{0} {1}", request.Method, request.Url);
+                    WriteLog("[{0}]{1} {2}", Remote.Address, request.Method, request.Url);
 
                     using var span = Host.Tracer?.NewSpan("proxy:HttpProxyRequest", request.Url + "");
 
