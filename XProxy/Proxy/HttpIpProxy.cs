@@ -151,7 +151,7 @@ namespace NewLife.Net.Proxy
                             break;
                     }
 
-                    if (addr != null && !addr.IsAny() && addrs.Any(e => e.Address == addr.Address))
+                    if (addr != null && !addr.IsAny() && addrs.Any(e => e.Equals(addr)))
                     {
                         client.Local.Address = addr;
                         WriteLog("CreateRemote IpMode={0}, LocalIp={1}", proxy.IpMode, addr);
