@@ -82,6 +82,7 @@ namespace NewLife.Net.Proxy
         {
             private String[] _white_ips;
             private String[] _black_ips;
+            private String _policy;
 
             #region 方法
             /// <summary>收到请求时</summary>
@@ -114,19 +115,27 @@ namespace NewLife.Net.Proxy
                         var ds = addrs.Where(e => _white_ips.Contains(e + "")).ToArray();
                         if (ds.Length > 0)
                         {
-                            var n = Interlocked.Increment(ref proxy._index);
-                            addr = ds[(n - 1) % ds.Length];
+                            var n = Interlocked.Increment(ref proxy._index) - 1;
+                            addr = ds[n % ds.Length];
+                            _policy = $"{n}#_white_ips";
                         }
                     }
 
                     for (var i = 0; addr == null && i < addrs.Length; i++)
                     {
-                        var n = Interlocked.Increment(ref proxy._index);
-                        var addr2 = addrs[(n - 1) % addrs.Length];
+                        var n = Interlocked.Increment(ref proxy._index) - 1;
+                        var addr2 = addrs[n % addrs.Length];
 
-                        if (_black_ips == null || !_black_ips.Contains(addr2 + ""))
+                        if (_black_ips == null)
                         {
                             addr = addr2;
+                            _policy = $"{n}#normal";
+                            break;
+                        }
+                        if (!_black_ips.Contains(addr2 + ""))
+                        {
+                            addr = addr2;
+                            _policy = $"{n}#_black_ips";
                             break;
                         }
                     }
@@ -147,6 +156,7 @@ namespace NewLife.Net.Proxy
                 {
                     // 响应头增加所使用的本地IP地址，让客户端知道
                     response.Headers["Local-Ip"] = RemoteServer.Local.Address + "";
+                    response.Headers["Local_IpPolicy"] = _policy;
                     e.Packet = response.Build();
                 }
 

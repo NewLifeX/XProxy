@@ -18,7 +18,7 @@ namespace Test
             {
                 var proxy = new WebProxy("10.0.0.3:8080")
                 {
-                    Credentials = new NetworkCredential("stone", "password"),
+                    Credentials = new NetworkCredential("stone", "newlife"),
                     //BypassProxyOnLocal = false,
                     //UseDefaultCredentials = false,
                 };
@@ -35,7 +35,7 @@ namespace Test
                 headers.Add("White-Ips", "10.0.0.1,10.0.0.2,10.0.0.3,10.0.0.3,");
                 headers.Add("Black-Ips", "10.0.0.4,10.0.0.5,10.0.0.8,10.0.0.6,");
 
-                var rs = client.GetAsync("https://myip.ipip.net/").Result;
+                var rs = client.GetAsync("http://myip.ipip.net").Result;
                 XTrace.WriteLine(rs.Content.ReadAsStringAsync().Result);
 
                 XTrace.WriteLine("Local-Ip: {0}", rs.Headers.GetValues("Local-Ip").Join());
