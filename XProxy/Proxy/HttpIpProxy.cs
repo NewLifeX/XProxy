@@ -145,13 +145,19 @@ namespace NewLife.Net.Proxy
                             {
                                 addr = Remote.Address;
                                 if (addr.IsAny() || addr == IPAddress.Loopback || addr == IPAddress.IPv6Loopback) addr = null;
+
+                                if (addr != null && !addrs.Any(e => e.Equals(addr)))
+                                {
+                                    WriteLog("CreateRemote IpMode={0}, {1} is not in local-ips", proxy.IpMode, addr);
+                                    addr = null;
+                                }
                             }
                             break;
                         default:
                             break;
                     }
 
-                    if (addr != null && !addr.IsAny() && addrs.Any(e => e.Equals(addr)))
+                    if (addr != null)
                     {
                         client.Local.Address = addr;
                         WriteLog("CreateRemote IpMode={0}, LocalIp={1}", proxy.IpMode, addr);
