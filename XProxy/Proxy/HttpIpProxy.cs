@@ -5,10 +5,27 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using NewLife.Net.Http;
+using NewLife.Security;
 using NewLife.Threading;
 
 namespace NewLife.Net.Proxy
 {
+    /// <summary>代理服务器使用本地IP的模式</summary>
+    public enum IpModes
+    {
+        /// <summary>任意IP</summary>
+        Any,
+
+        /// <summary>轮询</summary>
+        Round,
+
+        /// <summary>随机</summary>
+        Random,
+
+        /// <summary>同源，从进来的IP出去</summary>
+        Origin,
+    }
+
     /// <summary>支持使用多个本地IP地址的Http代理服务器</summary>
     public class HttpIpProxy : HttpProxy
     {
@@ -16,13 +33,29 @@ namespace NewLife.Net.Proxy
         /// <summary>本地地址集合</summary>
         public IPAddress[] Addresses { get; set; }
 
+        /// <summary>使用IP的模式。支持any/round/random/origin</summary>
+        public IpModes IpMode { get; set; }
+
         private Int32 _index;
         private TimerX _timer;
         private String _lastAddresses;
         #endregion
 
+        public override void Init(String config)
+        {
+            var dic = config?.SplitAsDictionary("=", ";");
+            if (dic != null && dic.Count > 0)
+            {
+                if (Enum.TryParse<IpModes>(dic["IpMode"], true, out var mode)) IpMode = mode;
+            }
+
+            base.Init(config);
+        }
+
         protected override void OnStart()
         {
+            WriteLog("IpMode: {0}", IpMode);
+
             _timer = new TimerX(DoGetIps, null, 0, 15_000) { Async = true };
 
             base.OnStart();
@@ -80,23 +113,7 @@ namespace NewLife.Net.Proxy
 
         private class IpSession : Session
         {
-            private String[] _white_ips;
-            private String[] _black_ips;
-            private String _policy;
-
             #region 方法
-            /// <summary>收到请求时</summary>
-            /// <param name="request"></param>
-            /// <param name="e"></param>
-            /// <returns></returns>
-            protected override Boolean OnRequest(HttpRequest request, ReceivedEventArgs e)
-            {
-                _white_ips = request.Headers["White-Ips"]?.Split(",").Where(e => !e.IsNullOrWhiteSpace()).Distinct().ToArray();
-                _black_ips = request.Headers["Black-Ips"]?.Split(",").Where(e => !e.IsNullOrWhiteSpace()).Distinct().ToArray();
-
-                return base.OnRequest(request, e);
-            }
-
             protected override ISocketClient CreateRemote(ReceivedEventArgs e)
             {
                 var client = base.CreateRemote(e);
@@ -108,51 +125,37 @@ namespace NewLife.Net.Proxy
                 {
                     IPAddress addr = null;
 
-                    // 指定了白名单，从中取IP
-                    if (_white_ips != null && _white_ips.Length > 0)
+                    switch (proxy.IpMode)
                     {
-                        // 计算白名单中有效的IP地址
-                        var ds = addrs.Where(e => _white_ips.Contains(e + "")).ToArray();
-                        for (var i = 0; i < ds.Length; i++)
-                        {
-                            var n = Interlocked.Increment(ref proxy._index) - 1;
-                            var addr2 = ds[n % ds.Length];
-
-                            if (_black_ips == null)
+                        case IpModes.Any:
+                            break;
+                        case IpModes.Round:
                             {
-                                addr = addr2;
-                                _policy = $"{n}#_white_ips";
-                                break;
+                                var n = Interlocked.Increment(ref proxy._index) - 1;
+                                addr = addrs[n % addrs.Length];
                             }
-                            if (!_black_ips.Contains(addr2 + ""))
+                            break;
+                        case IpModes.Random:
                             {
-                                addr = addr2;
-                                _policy = $"{n}#_white_ips#not_in_black_ips";
-                                break;
+                                var n = Rand.Next(addrs.Length);
+                                addr = addrs[n % addrs.Length];
                             }
-                        }
+                            break;
+                        case IpModes.Origin:
+                            {
+                                addr = Remote.Address;
+                                if (addr.IsAny() || addr == IPAddress.Loopback || addr == IPAddress.IPv6Loopback) addr = null;
+                            }
+                            break;
+                        default:
+                            break;
                     }
 
-                    for (var i = 0; addr == null && i < addrs.Length; i++)
+                    if (addr != null && !addr.IsAny() && addrs.Any(e => e.Address == addr.Address))
                     {
-                        var n = Interlocked.Increment(ref proxy._index) - 1;
-                        var addr2 = addrs[n % addrs.Length];
-
-                        if (_black_ips == null)
-                        {
-                            addr = addr2;
-                            _policy = $"{n}#normal";
-                            break;
-                        }
-                        if (!_black_ips.Contains(addr2 + ""))
-                        {
-                            addr = addr2;
-                            _policy = $"{n}#normal#not_in_black_ips";
-                            break;
-                        }
+                        client.Local.Address = addr;
+                        WriteLog("CreateRemote IpMode={0}, LocalIp={1}", proxy.IpMode, addr);
                     }
-
-                    if (addr != null) client.Local.Address = addr;
                 }
 
                 return client;
@@ -167,8 +170,7 @@ namespace NewLife.Net.Proxy
                 if (response.Parse(e.Packet))
                 {
                     // 响应头增加所使用的本地IP地址，让客户端知道
-                    response.Headers["Local-Ip"] = RemoteServer.Local.Address + "";
-                    response.Headers["Local_IpPolicy"] = _policy;
+                    response.Headers["Proxy-Local-Ip"] = RemoteServer.Local.Address + "";
                     e.Packet = response.Build();
                 }
 
