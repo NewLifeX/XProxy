@@ -143,7 +143,7 @@ namespace NewLife.Net.Proxy
                             break;
                         case IpModes.Origin:
                             {
-                                addr = Remote.Address;
+                                addr = Session.Local.Address;
                                 if (addr.IsAny() || addr == IPAddress.Loopback || addr == IPAddress.IPv6Loopback) addr = null;
 
                                 if (addr != null && !addrs.Any(e => e.Equals(addr)))
