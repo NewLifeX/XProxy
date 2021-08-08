@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using NewLife.Http;
 using NewLife.Net.Http;
 
 namespace NewLife.Net.Proxy

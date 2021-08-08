@@ -8,8 +8,8 @@
     <Description>NAT反向代理，Http反向代理</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2002~2021</Copyright>
-    <Version>3.1.2021.0731</Version>
-    <FileVersion>3.1.2021.0731</FileVersion>
+    <Version>3.1.2021.0808</Version>
+    <FileVersion>3.1.2021.0808</FileVersion>
     <AssemblyVersion>3.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\BinServer</OutputPath>
@@ -53,10 +53,13 @@
 
   <ItemGroup>
     <Compile Remove="ByteHelper.cs" />
+    <Compile Remove="Http\HttpBase.cs" />
     <Compile Remove="Http\HttpCache.cs" />
     <Compile Remove="Http\HttpHelper.cs" />
     <Compile Remove="Http\HttpPlugin.cs" />
     <Compile Remove="Http\HttpPluginBase.cs" />
+    <Compile Remove="Http\HttpRequest.cs" />
+    <Compile Remove="Http\HttpResponse.cs" />
     <Compile Remove="Http\IHttpPlugin.cs" />
     <Compile Remove="NetData.cs" />
     <Compile Remove="NetHelper.cs" />
@@ -64,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.10.2021.723-beta1" />
+    <PackageReference Include="NewLife.Core" Version="8.11.2021.806" />
     <PackageReference Include="NewLife.Agent">
       <Version>8.7.2021.708</Version>
     </PackageReference>
