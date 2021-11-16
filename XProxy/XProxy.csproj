@@ -67,11 +67,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.11.2021.1030-beta3" />
+    <PackageReference Include="NewLife.Core" Version="8.11.2021.1109" />
     <PackageReference Include="NewLife.Agent">
-      <Version>8.7.2021.1001</Version>
+      <Version>8.8.2021.1109</Version>
     </PackageReference>
-    <PackageReference Include="NewLife.Stardust" Version="1.5.2021.1030-beta3" />
+    <PackageReference Include="NewLife.Stardust" Version="1.5.2021.1109" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
