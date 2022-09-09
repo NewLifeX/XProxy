@@ -12,9 +12,6 @@ using NewLife.Reflection;
 using NewLife.Serialization;
 using NewLife.Threading;
 using Stardust;
-#if !NET4
-using TaskEx = System.Threading.Tasks.Task;
-#endif
 
 namespace XProxy
 {
@@ -30,7 +27,7 @@ namespace XProxy
             ServiceName = "XProxy";
             DisplayName = "XProxy代理服务器";
 
-            TaskEx.Run(() => ShowAll());
+            Task.Run(() => ShowAll());
         }
 
         private TimerX _timer;
@@ -151,6 +148,12 @@ namespace XProxy
             // 配置日志
             proxy.Log = XTrace.Log;
             if (debug) proxy.SessionLog = XTrace.Log;
+
+            if (XTrace.Log.Level <= LogLevel.Debug)
+            {
+                proxy.LogSend = true;
+                proxy.LogReceive = true;
+            }
 
             // 启动服务
             proxy.Start();
