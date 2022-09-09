@@ -70,7 +70,7 @@ public class ProxySession : NetSession
         var len = e.Packet.Total;
         if (len > 0 || len == 0 && ExchangeEmptyData)
         {
-            if (len > 0) WriteLog("收到客户端 {0}", e.Packet.ToHex(1024));
+            //if (len > 0) WriteLog("收到客户端 {0}", e.Packet.ToHex(1024));
 
             // 如果未建立到远程服务器链接，则建立
             if (RemoteServer == null) ConnectRemote(e);
@@ -162,7 +162,7 @@ public class ProxySession : NetSession
     protected virtual void OnReceiveRemote(ReceivedEventArgs e)
     {
         var len = e.Packet.Total;
-        if (len > 0) WriteLog("收到服务端 {0}", e.Packet.ToHex(1024));
+        //if (len > 0) WriteLog("收到服务端 {0}", e.Packet.ToHex(1024));
 
         if (len > 0 || len == 0 && ExchangeEmptyData)
         {
