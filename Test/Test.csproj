@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <OutputPath>..\BinTest</OutputPath>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputPath>..\Bin\Test</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.11.2021.1225" />
+    <PackageReference Include="NewLife.Core" Version="10.0.2022.901" />
   </ItemGroup>
 
 </Project>
