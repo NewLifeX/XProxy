@@ -151,6 +151,7 @@ namespace XProxy
 
             if (XTrace.Log.Level <= LogLevel.Debug)
             {
+                proxy.SocketLog = XTrace.Log;
                 proxy.LogSend = true;
                 proxy.LogReceive = true;
             }
