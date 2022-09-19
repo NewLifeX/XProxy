@@ -12,6 +12,7 @@ using NewLife.Reflection;
 using NewLife.Serialization;
 using NewLife.Threading;
 using Stardust;
+using XProxy.Proxy;
 
 namespace XProxy
 {
@@ -147,7 +148,11 @@ namespace XProxy
 
             // 配置日志
             proxy.Log = XTrace.Log;
-            if (debug) proxy.SessionLog = XTrace.Log;
+            if (debug)
+            {
+                proxy.SessionLog = XTrace.Log;
+                proxy.Debug = debug;
+            }
 
             if (XTrace.Log.Level <= LogLevel.Debug)
             {

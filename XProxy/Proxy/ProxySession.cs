@@ -1,5 +1,5 @@
-﻿using System;
-using NewLife.Data;
+﻿using NewLife.Data;
+using NewLife.Log;
 
 namespace NewLife.Net.Proxy;
 
@@ -23,6 +23,9 @@ public class ProxySession : NetSession
 
     /// <summary>是否中转空数据包。默认true</summary>
     public Boolean ExchangeEmptyData { get; set; } = true;
+
+    FileStream _logClient;
+    FileStream _logServer;
     #endregion
 
     #region 构造
@@ -41,6 +44,9 @@ public class ProxySession : NetSession
             RemoteServer = null;
             remote.TryDispose();
         }
+
+        _logClient.TryDispose();
+        _logServer.TryDispose();
     }
     #endregion
 
@@ -56,6 +62,20 @@ public class ProxySession : NetSession
 
         if (Host is ProxyBase proxy && proxy.ConnectRemoteOnStart) ConnectRemote(null);
 
+        if (Host.Debug)
+        {
+            var time = DateTime.Now;
+            var path = XTrace.LogPath;
+
+            var fileClient = path.CombinePath($"{time:yyyyMMddHHmmss}_{ID}_client.bin");
+            _logClient = fileClient.AsFile().OpenWrite();
+
+            var fileServer = path.CombinePath($"{time:yyyyMMddHHmmss}_{ID}_server.bin");
+            _logServer = fileServer.AsFile().OpenWrite();
+
+            WriteLog("_logClient = {0}", fileClient);
+        }
+
         base.Start();
     }
 
@@ -65,12 +85,12 @@ public class ProxySession : NetSession
     {
         if (Disposed) return;
 
-        //WriteLog("客户端[{0}] {1}", e.Length, e.ToHex(16));
-
         var len = e.Packet.Total;
         if (len > 0 || len == 0 && ExchangeEmptyData)
         {
-            //if (len > 0) WriteLog("收到客户端 {0}", e.Packet.ToHex(1024));
+            //if (len > 0) WriteLog("收到客户端[{0}]", len);
+            //if (len > 0) WriteLog("=>");
+            if (len > 0 && _logClient != null) e.Packet.CopyTo(_logClient);
 
             // 如果未建立到远程服务器链接，则建立
             if (RemoteServer == null) ConnectRemote(e);
@@ -162,11 +182,13 @@ public class ProxySession : NetSession
     protected virtual void OnReceiveRemote(ReceivedEventArgs e)
     {
         var len = e.Packet.Total;
-        //if (len > 0) WriteLog("收到服务端 {0}", e.Packet.ToHex(1024));
+        //if (len > 0) WriteLog("收到服务端[{0}]", len);
+        //if (len > 0) WriteLog("<=");
 
         if (len > 0 || len == 0 && ExchangeEmptyData)
         {
             using var span = Host.Tracer?.NewSpan("proxy:OnReceiveRemote", RemoteServerUri + "");
+            if (len > 0 && _logServer != null) e.Packet.CopyTo(_logServer);
 
             var session = Session;
             if (session == null || session.Disposed)

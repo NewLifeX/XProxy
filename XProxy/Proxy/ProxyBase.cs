@@ -11,6 +11,9 @@ public abstract class ProxyBase : NetServer
     #region 属性
     /// <summary>开始会话时连接远程会话。默认false</summary>
     public Boolean ConnectRemoteOnStart { get; set; }
+
+    /// <summary>调试开关</summary>
+    public Boolean Debug { get; set; }
     #endregion
 
     #region 构造函数

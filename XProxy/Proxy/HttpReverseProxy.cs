@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using NewLife.Net.Http;
+using XProxy.Proxy;
 
 namespace NewLife.Net.Proxy
 {

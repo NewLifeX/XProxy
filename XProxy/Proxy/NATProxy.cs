@@ -1,4 +1,8 @@
-﻿namespace NewLife.Net.Proxy;
+﻿using NewLife;
+using NewLife.Net;
+using NewLife.Net.Proxy;
+
+namespace XProxy.Proxy;
 
 /// <summary>通用NAT代理。所有收到的数据，都转发到指定目标</summary>
 public class NATProxy : ProxyBase
@@ -9,6 +13,9 @@ public class NATProxy : ProxyBase
 
     /// <summary>端口数。支持映射一批端口到目标服务器的对应端口上</summary>
     public Int32 Ports { get; set; }
+
+    /// <summary>前导语。验证第一个包必须包含该前导语</summary>
+    public String Prefix { get; set; }
     #endregion
 
     #region 构造
@@ -35,6 +42,7 @@ public class NATProxy : ProxyBase
         if (dic != null && dic.Count > 0)
         {
             Ports = dic["Ports"].ToInt();
+            Prefix = dic["Prefix"];
         }
     }
 
@@ -47,19 +55,20 @@ public class NATProxy : ProxyBase
 
         // 多端口
         if (Ports > 1)
-        {
             for (var i = 0; i < Ports; i++)
             {
                 var list = CreateServer(Local.Address, Port + i, Local.Type, AddressFamily);
                 foreach (var item in list)
-                {
                     AttachServer(item);
-                }
             }
-        }
 
         base.OnStart();
     }
+
+    /// <summary>创建会话</summary>
+    /// <param name="session"></param>
+    /// <returns></returns>
+    protected override INetSession CreateSession(ISocketSession session) => new NATSession { Host = this };
 
     /// <summary>添加会话。子类可以在添加会话前对会话进行一些处理</summary>
     /// <param name="session"></param>
