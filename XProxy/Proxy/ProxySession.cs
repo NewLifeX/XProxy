@@ -1,4 +1,5 @@
-﻿using NewLife.Data;
+﻿using System.IO;
+using NewLife.Data;
 using NewLife.Log;
 
 namespace NewLife.Net.Proxy;
@@ -51,6 +52,35 @@ public class ProxySession : NetSession
     #endregion
 
     #region 数据交换
+    void WriteLogFile(String kind, Packet pk)
+    {
+        if (!Host.Debug) return;
+        if (pk == null || pk.Total == 0) return;
+
+        if (kind == "client")
+        {
+            if (_logClient == null)
+            {
+                var time = DateTime.Now;
+                var path = XTrace.LogPath;
+                var fileClient = path.CombinePath($"{time:yyyyMMddHHmmss}_{ID}_client.bin");
+                _logClient = fileClient.AsFile().OpenWrite();
+            }
+            pk.CopyTo(_logClient);
+        }
+        else if (kind == "server")
+        {
+            if (_logServer == null)
+            {
+                var time = DateTime.Now;
+                var path = XTrace.LogPath;
+                var fileClient = path.CombinePath($"{time:yyyyMMddHHmmss}_{ID}_server.bin");
+                _logServer = fileClient.AsFile().OpenWrite();
+            }
+            pk.CopyTo(_logServer);
+        }
+    }
+
     /// <summary>开始会话处理。</summary>
     public override void Start()
     {
@@ -61,20 +91,6 @@ public class ProxySession : NetSession
         if (Session is TcpSession tcp) tcp.DisconnectWhenEmptyData = false;
 
         if (Host is ProxyBase proxy && proxy.ConnectRemoteOnStart) ConnectRemote(null);
-
-        if (Host.Debug)
-        {
-            var time = DateTime.Now;
-            var path = XTrace.LogPath;
-
-            var fileClient = path.CombinePath($"{time:yyyyMMddHHmmss}_{ID}_client.bin");
-            _logClient = fileClient.AsFile().OpenWrite();
-
-            var fileServer = path.CombinePath($"{time:yyyyMMddHHmmss}_{ID}_server.bin");
-            _logServer = fileServer.AsFile().OpenWrite();
-
-            WriteLog("_logClient = {0}", fileClient);
-        }
 
         base.Start();
     }
@@ -88,9 +104,8 @@ public class ProxySession : NetSession
         var len = e.Packet.Total;
         if (len > 0 || len == 0 && ExchangeEmptyData)
         {
-            //if (len > 0) WriteLog("收到客户端[{0}]", len);
-            //if (len > 0) WriteLog("=>");
-            if (len > 0 && _logClient != null) e.Packet.CopyTo(_logClient);
+            using var span = Host.Tracer?.NewSpan("proxy:OnReceive", Remote + "");
+            if (len > 0) WriteLogFile("client", e.Packet);
 
             // 如果未建立到远程服务器链接，则建立
             if (RemoteServer == null) ConnectRemote(e);
@@ -181,14 +196,13 @@ public class ProxySession : NetSession
     /// <param name="e"></param>
     protected virtual void OnReceiveRemote(ReceivedEventArgs e)
     {
-        var len = e.Packet.Total;
-        //if (len > 0) WriteLog("收到服务端[{0}]", len);
-        //if (len > 0) WriteLog("<=");
+        if (Disposed) return;
 
+        var len = e.Packet.Total;
         if (len > 0 || len == 0 && ExchangeEmptyData)
         {
             using var span = Host.Tracer?.NewSpan("proxy:OnReceiveRemote", RemoteServerUri + "");
-            if (len > 0 && _logServer != null) e.Packet.CopyTo(_logServer);
+            if (len > 0) WriteLogFile("server", e.Packet);
 
             var session = Session;
             if (session == null || session.Disposed)
