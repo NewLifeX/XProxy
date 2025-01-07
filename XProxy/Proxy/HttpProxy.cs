@@ -64,7 +64,7 @@ public class HttpProxy : ProxyBase
         /// <param name="e"></param>
         protected override void OnReceive(ReceivedEventArgs e)
         {
-            if (e.Packet.Total == 0 || !HttpBase.FastValidHeader(e.Packet))
+            if (e.Packet.Total == 0 || !HttpBase.FastValidHeader(e.Packet.GetSpan()))
             {
                 base.OnReceive(e);
                 return;
@@ -73,9 +73,9 @@ public class HttpProxy : ProxyBase
             var request = new HttpRequest();
             if (request.Parse(e.Packet))
             {
-                WriteLog("[{0}]{1} {2}", Remote.Address, request.Method, request.Url);
+                WriteLog("[{0}]{1} {2}", Remote.Address, request.Method, request.RequestUri);
 
-                using var span = Host.Tracer?.NewSpan("proxy:HttpProxyRequest", request.Url + "");
+                using var span = Host.Tracer?.NewSpan("proxy:HttpProxyRequest", request.RequestUri + "");
 
                 if (!OnRequest(request, e)) return;
 
@@ -101,9 +101,9 @@ public class HttpProxy : ProxyBase
 
             var remote = RemoteServer;
             var ruri = RemoteServerUri;
-            if (request.Url.IsAbsoluteUri)
+            if (request.RequestUri.IsAbsoluteUri)
             {
-                var uri = request.Url;
+                var uri = request.RequestUri;
                 var host = uri.Host + ":" + uri.Port;
 
                 // 可能不含Host
@@ -118,7 +118,7 @@ public class HttpProxy : ProxyBase
 
                 ruri.Host = uri.Host;
                 ruri.Port = uri.Port;
-                request.Url = new Uri(uri.PathAndQuery, UriKind.Relative);
+                request.RequestUri = new Uri(uri.PathAndQuery, UriKind.Relative);
             }
             else if (!request.Host.IsNullOrEmpty())
             {
@@ -192,11 +192,11 @@ public class HttpProxy : ProxyBase
 
         private Boolean ProcessConnect(HttpRequest request, ReceivedEventArgs e)
         {
-            using var span = Host.Tracer?.NewSpan("proxy:HttpProxyConnect", request.Url + "");
+            using var span = Host.Tracer?.NewSpan("proxy:HttpProxyConnect", request.RequestUri + "");
 
             var pxy = Host as HttpProxy;
 
-            var uri = new NetUri(request.Url.ToString());
+            var uri = new NetUri(request.RequestUri.ToString());
             var ruri = RemoteServerUri;
             ruri.Host = uri.Host;
             ruri.Port = uri.Port;

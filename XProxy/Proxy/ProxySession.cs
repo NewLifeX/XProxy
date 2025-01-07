@@ -52,7 +52,7 @@ public class ProxySession : NetSession
     #endregion
 
     #region 数据交换
-    void WriteLogFile(String kind, Packet pk)
+    void WriteLogFile(String kind, IPacket pk)
     {
         if (!Host.Debug) return;
         if (pk == null || pk.Total == 0) return;
@@ -87,8 +87,8 @@ public class ProxySession : NetSession
         // 如果未指定远程协议，则与来源协议一致
         if (RemoteServerUri.Type == 0) RemoteServerUri.Type = Session.Local.Type;
 
-        // 如果是Tcp，收到空数据时不要断开。为了稳定可靠，默认设置
-        if (Session is TcpSession tcp) tcp.DisconnectWhenEmptyData = false;
+        //// 如果是Tcp，收到空数据时不要断开。为了稳定可靠，默认设置
+        //if (Session is TcpSession tcp) tcp.DisconnectWhenEmptyData = false;
 
         if (Host is ProxyBase proxy && proxy.ConnectRemoteOnStart) ConnectRemote(null);
 
@@ -167,8 +167,8 @@ public class ProxySession : NetSession
     protected virtual ISocketClient CreateRemote(ReceivedEventArgs e)
     {
         var client = RemoteServerUri.CreateRemote();
-        // 如果是Tcp，收到空数据时不要断开。为了稳定可靠，默认设置
-        if (client is TcpSession tcp) tcp.DisconnectWhenEmptyData = false;
+        //// 如果是Tcp，收到空数据时不要断开。为了稳定可靠，默认设置
+        //if (client is TcpSession tcp) tcp.DisconnectWhenEmptyData = false;
 
         return client;
     }
@@ -216,7 +216,7 @@ public class ProxySession : NetSession
     #region 发送
     /// <summary>发送数据</summary>
     /// <param name="pk">缓冲区</param>
-    public virtual Int32 SendToRemote(Packet pk)
+    public virtual Int32 SendToRemote(IPacket pk)
     {
         var client = RemoteServer;
         using var span = Host.Tracer?.NewSpan($"proxy:SendToRemote:{client.Local.Address}", RemoteServerUri + "");

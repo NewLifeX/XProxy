@@ -72,7 +72,7 @@ namespace XProxy
         }
 
         private ITracer _tracer;
-        protected override void StartWork(String reason)
+        public override void StartWork(String reason)
         {
             var star = new StarFactory(null, null, null);
             if (!star.Server.IsNullOrEmpty()) _tracer = star.Tracer;
@@ -84,7 +84,7 @@ namespace XProxy
             base.StartWork(reason);
         }
 
-        protected override void StopWork(String reason)
+        public override void StopWork(String reason)
         {
             _timer.TryDispose();
             _timer = null;

@@ -62,11 +62,11 @@ namespace NewLife.Net.Proxy
             base.OnStart();
         }
 
-        protected override void OnStop()
+        protected override void OnStop(String reason)
         {
             _timer.TryDispose();
 
-            base.OnStop();
+            base.OnStop(reason);
         }
 
         private void DoGetIps(Object state)
