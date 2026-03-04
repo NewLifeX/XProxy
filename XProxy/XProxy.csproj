@@ -58,7 +58,7 @@
     <PackageReference Include="NewLife.Agent">
       <Version>10.15.2026.201</Version>
     </PackageReference>
-    <PackageReference Include="NewLife.Stardust" Version="3.7.2026.201" />
+    <PackageReference Include="NewLife.Stardust" Version="3.7.2026.303" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
