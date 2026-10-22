@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using NewLife.Http;
-using NewLife.Net.Http;
 
 namespace NewLife.Net.Proxy;
 
@@ -47,11 +46,11 @@ public class HttpProxy : ProxyBase
     /// <returns></returns>
     protected override INetSession CreateSession(ISocketSession session) => new Session();
 
-    /// <summary>Http反向代理会话</summary>
+    /// <summary>Http代理会话</summary>
     public class Session : ProxySession
     {
-        /// <summary>已完成处理，正在转发数据的请求头</summary>
-        public HttpHeader Request { get; set; }
+        /// <summary>已完成处理，正在转发数据的请求</summary>
+        public HttpRequest Request { get; set; }
 
         /// <summary>已认证</summary>
         public Boolean Authenticated { get; set; }
@@ -91,6 +90,8 @@ public class HttpProxy : ProxyBase
         /// <returns></returns>
         protected virtual Boolean OnRequest(HttpRequest request, ReceivedEventArgs e)
         {
+            Request = request;
+
             var proxy = (this as INetSession).Host as HttpProxy;
 
             // 代理认证
@@ -104,29 +105,44 @@ public class HttpProxy : ProxyBase
             if (request.RequestUri.IsAbsoluteUri)
             {
                 var uri = request.RequestUri;
-                var host = uri.Host + ":" + uri.Port;
+                var secure = uri.Scheme.EqualIgnoreCase("https", "wss");
 
                 // 可能不含Host
-                if (request.Host.IsNullOrEmpty()) request.Host = host;
+                if (request.Host.IsNullOrEmpty()) request.Host = uri.IsDefaultPort ? uri.Host : $"{uri.Host}:{uri.Port}";
 
-                // 如果地址或端口改变，则重新连接服务器
-                if (remote != null && (uri.Host != ruri.Host || uri.Port != ruri.Port))
+                // 如果地址、端口或安全协议改变，则重新连接服务器
+                if (remote != null && (uri.Host != ruri.Host || uri.Port != ruri.Port || ruri.IsSecure != secure))
                 {
                     remote.Dispose();
                     RemoteServer = null;
                 }
 
+                ruri.Type = secure ? NetType.Https : NetType.Http;
+                ruri.IsSecure = secure;
                 ruri.Host = uri.Host;
                 ruri.Port = uri.Port;
-                request.RequestUri = new Uri(uri.PathAndQuery, UriKind.Relative);
+
+                // 保留绝对地址。BuildHeader 会输出 origin-form 请求行，且旧版 NewLife.Core 对相对 Uri 取 PathAndQuery 会抛异常
+                //request.RequestUri = new Uri(uri.PathAndQuery, UriKind.Relative);
             }
             else if (!request.Host.IsNullOrEmpty())
             {
-                ruri.Host = request.Host;
-                ruri.Port = 80;
+                var host = request.Host;
+                var port = 80;
+                var p = host.LastIndexOf(':');
+                if (p > 0 && Int32.TryParse(host.Substring(p + 1), out var pt))
+                {
+                    host = host.Substring(0, p);
+                    port = pt;
+                }
+
+                ruri.Type = NetType.Http;
+                ruri.IsSecure = false;
+                ruri.Host = host;
+                ruri.Port = port;
             }
             else
-                throw new XException("无法处理的请求！{0}", request);
+                throw new XException("Unsupported request: {0}", request);
 
             // 处理KeepAlive
             if (request.Headers.TryGetValue("Proxy-Connection", out var str))
@@ -204,7 +220,7 @@ public class HttpProxy : ProxyBase
             // 不要连自己，避免死循环
             if (uri.Port == pxy.Server.Port && uri.Address.IsLocal())
             {
-                WriteLog("不要连自己，避免死循环");
+                WriteLog("Refusing to connect to the proxy itself to avoid a loop.");
                 Dispose();
                 return false;
             }
