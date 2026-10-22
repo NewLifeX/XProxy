@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>XProxy</AssemblyName>
-    <AssemblyTitle>新生命代理服务器</AssemblyTitle>
-    <Description>NAT反向代理，Http反向代理</Description>
+    <AssemblyTitle>XProxy Proxy Server</AssemblyTitle>
+    <Description>Proxy server host for NAT reverse proxy and HTTP forward/reverse proxy.</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2002~2026</Copyright>
     <VersionPrefix>3.2</VersionPrefix>
@@ -18,6 +18,8 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- net8.0+ 常驻启用 AOT/裁剪分析器，0 告警作为构建期约束 -->
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
@@ -54,15 +56,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="11.13.2026.301" />
-    <PackageReference Include="NewLife.Agent">
-      <Version>10.15.2026.201</Version>
-    </PackageReference>
-    <PackageReference Include="NewLife.Stardust" Version="3.7.2026.303" />
+    <PackageReference Include="NewLife.Core" Version="12.0.2026.1021-beta0321" />
+    <PackageReference Include="NewLife.Agent" Version="10.18.2026.1013-beta0145" />
+    <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1021-beta0432" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="del &quot;$(TargetDir)*.xml&quot; /q" />
+    <ItemGroup>
+      <XmlDocs Include="$(TargetDir)*.xml" />
+    </ItemGroup>
+    <Delete Files="@(XmlDocs)" />
   </Target>
 
 </Project>

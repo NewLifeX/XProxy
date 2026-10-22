@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using NewLife;
@@ -18,6 +20,9 @@ namespace XProxy
 {
     class Program
     {
+        // 配置读取依赖 XmlConfig 反射访问属性，AOT 裁剪时显式保留
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Setting))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ProxyItem))]
         static void Main(String[] args) => new MyService().Main(args);
     }
 
@@ -26,7 +31,11 @@ namespace XProxy
         public MyService()
         {
             ServiceName = "XProxy";
-            DisplayName = "XProxy代理服务器";
+
+            // 提前加载配置并应用界面语言，保证后续显示文本与日志使用配置语言
+            _ = Setting.Current;
+            DisplayName = L.T("XProxy Proxy Server");
+            Description = L.T("Proxy server host for NAT reverse proxy and HTTP forward/reverse proxy.");
 
             Task.Run(() => ShowAll());
         }
@@ -65,7 +74,7 @@ namespace XProxy
 
                         using var span = _tracer?.NewSpan("StopProxy", pi.Name);
 
-                        pi.Stop("配置停用");
+                        pi.Stop(L.T("Disabled by configuration"));
                     }
                 }
             }
@@ -74,8 +83,14 @@ namespace XProxy
         private ITracer _tracer;
         public override void StartWork(String reason)
         {
-            var star = new StarFactory(null, null, null);
-            if (!star.Server.IsNullOrEmpty()) _tracer = star.Tracer;
+            // 星尘链路追踪依赖动态程序集反射，NativeAOT 下关闭，不影响代理转发
+            if (RuntimeFeature.IsDynamicCodeSupported)
+            {
+                var star = new StarFactory(null, null, null);
+                if (!star.Server.IsNullOrEmpty()) _tracer = star.Tracer;
+            }
+            else
+                XTrace.WriteLine("NativeAOT is running without Stardust tracing.");
 
             //CheckProxy();
             // 检查运行时新增代理配置
@@ -108,17 +123,19 @@ namespace XProxy
             Console.WriteLine();
 
             var ps = ProxyHelper.GetAll();
-            XTrace.WriteLine("共有代理提供者[{0}]：", ps.Length);
+            XTrace.WriteLine("Proxy providers: {0}", ps.Length);
             foreach (var item in ps)
             {
-                var pxy = item.CreateInstance() as ProxyBase;
+                var pxy = ProxyHelper.Create(item);
+                if (pxy == null) continue;
+
                 XTrace.WriteLine("{0}\t{1}\t{2}", pxy.Name, item.GetDisplayName(), item.FullName);
             }
 
             Console.WriteLine();
             var set = Setting.Current;
             var xs = set.Items ?? new ProxyItem[0];
-            XTrace.WriteLine("共有代理配置[{0}]：", xs.Length);
+            XTrace.WriteLine("Proxy configurations: {0}", xs.Length);
             foreach (var item in xs)
             {
                 XTrace.WriteLine("{0}\t{1}\t{2}\t{3}=>{4}\t{5}", item.Name, item.Provider, item.Enable, item.Local, item.Remote, item.Config);
@@ -128,17 +145,18 @@ namespace XProxy
         private ProxyBase CreateProxy(ProxyItem item, Boolean debug)
         {
             var xs = ProxyHelper.GetAll();
-            var type = xs.FirstOrDefault(e => item.Provider.EqualIgnoreCase(e.Name, e.FullName, e.Name.TrimEnd("Proxy")));
+            var type = xs.FirstOrDefault(e => item.Provider.EqualIgnoreCase(e.Name, e.FullName, e.Name.TrimSuffix("Proxy")));
             if (type == null) return null;
 
-            if (type.CreateInstance() is not ProxyBase proxy) return null;
+            var proxy = ProxyHelper.Create(type);
+            if (proxy == null) return null;
 
             using var span = _tracer?.NewSpan("CreateProxy", item);
 
             proxy.Name = item.Name;
             proxy.Tracer = _tracer;
 
-            XTrace.WriteLine("创建代理 {0}", item.ToJson());
+            XTrace.WriteLine("Creating proxy {0}", item.ToJson());
 
             proxy.Init(item.Config);
 

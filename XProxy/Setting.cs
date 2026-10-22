@@ -2,7 +2,6 @@
 using System.Xml.Serialization;
 using NewLife;
 using NewLife.Net.Proxy;
-using NewLife.Reflection;
 using NewLife.Xml;
 using XProxy.Proxy;
 
@@ -14,12 +13,16 @@ namespace XProxy
     {
         #region 属性
         /// <summary>调试开关。默认true</summary>
-        [Description("调试开关。默认true")]
+        [Description("Debug mode. Default true.")]
         public Boolean Debug { get; set; } = true;
 
         /// <summary>配置项</summary>
-        [Description("配置项")]
+        [Description("Proxy items.")]
         public ProxyItem[] Items { get; set; }
+
+        /// <summary>界面语言。留空时跟随系统，例如 en、zh-CN、zh-TW</summary>
+        [Description("UI language. Leave empty to follow the system; for example en, zh-CN, zh-TW.")]
+        public String Language { get; set; }
         #endregion
 
         #region 方法
@@ -27,6 +30,9 @@ namespace XProxy
         /// <summary>已加载</summary>
         protected override void OnLoaded()
         {
+            // 配置加载后立即应用界面语言
+            Localization.SetLanguage(Language);
+
             // 本进程的第一次加载时，补齐缺失项
             if (_proxyArray == null)
             {
@@ -43,8 +49,10 @@ namespace XProxy
                 {
                     if (!item.IsAbstract && item.GetGenericArguments().Length == 0)
                     {
-                        var pxy = item.CreateInstance() as ProxyBase;
-                        var name = pxy.Name.TrimEnd("Proxy");
+                        var pxy = ProxyHelper.Create(item);
+                        if (pxy == null) continue;
+
+                        var name = pxy.Name.TrimSuffix("Proxy");
                         // 如果没有该类型的代理项，则增加一个
                         if (!list.Any(e => e.Provider == name))
                         {

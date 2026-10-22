@@ -67,7 +67,7 @@ public class HttpReverseProxy : NATProxy
                 return;
             }
 
-            WriteLog("{3}请求：{0} {1} [{2}]", entity.Method, entity.Url, entity.ContentLength, ID);
+            WriteLog("{3}Request: {0} {1} [{2}]", entity.Method, entity.Url, entity.ContentLength, ID);
 
             Request = entity;
 

@@ -86,11 +86,8 @@ namespace NewLife.Net.Proxy
 
                     foreach (var elm in ipp.UnicastAddresses)
                     {
-                        try
-                        {
-                            if (elm.DuplicateAddressDetectionState != DuplicateAddressDetectionState.Preferred) continue;
-                        }
-                        catch { }
+                        // 该属性仅 Windows 支持，其它平台直接视为可用地址
+                        if (OperatingSystem.IsWindows() && elm.DuplicateAddressDetectionState != DuplicateAddressDetectionState.Preferred) continue;
 
                         if (elm.Address.IsIPv4()) addrs.Add(elm.Address);
                     }
@@ -102,7 +99,7 @@ namespace NewLife.Net.Proxy
             if (!_lastAddresses.IsNullOrEmpty() && _lastAddresses == str) return;
             _lastAddresses = str;
 
-            WriteLog("可用本机地址：{0}", str);
+            WriteLog("Available local addresses: {0}", str);
 
             Addresses = addrs.ToArray();
         }

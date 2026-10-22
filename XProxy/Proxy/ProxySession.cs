@@ -254,7 +254,7 @@ public class ProxySession : NetSession
             if (_LogPrefix == null)
             {
                 var session = this as INetSession;
-                var name = session.Host == null ? "" : session.Host.Name.TrimEnd("Proxy");
+                var name = session.Host == null ? "" : session.Host.Name.TrimSuffix("Proxy");
                 _LogPrefix = $"{name}[{ID}] ";
             }
             return _LogPrefix;

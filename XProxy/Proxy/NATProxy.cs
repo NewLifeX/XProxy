@@ -49,7 +49,7 @@ public class NATProxy : ProxyBase
     /// <summary>开始</summary>
     protected override void OnStart()
     {
-        WriteLog("NAT代理 => {0}", RemoteServer);
+        WriteLog("NAT proxy => {0}", RemoteServer);
 
         if (RemoteServer.Type == 0) RemoteServer.Type = ProtocolType;
 

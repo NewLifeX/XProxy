@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Other/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Test/Test.csproj" />
+  <Project Path="XProxy/XProxy.csproj" />
+</Solution>
