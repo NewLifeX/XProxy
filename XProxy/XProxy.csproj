@@ -58,6 +58,8 @@
   <ItemGroup>
     <PackageReference Include="NewLife.Core" Version="12.0.2026.1021-beta0321" />
     <PackageReference Include="NewLife.Agent" Version="10.18.2026.1013-beta0145" />
+    <!-- 由 Stardust 间接使用，显式升级到最新 beta -->
+    <PackageReference Include="NewLife.Remoting" Version="3.9.2026.1022-beta0147" />
     <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1021-beta0432" />
   </ItemGroup>
 
