@@ -10,7 +10,7 @@
 🌐 [English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [한국어](README.ko.md) | [العربية](README.ar.md)
 <!-- lang:end -->
 
-**XProxy** 是 NewLife 生態中的代理伺服器宿主環境。單一程序可寄宿多個 `ProxyBase` 服務，包括 NAT 反向代理、HTTP 正向代理與 HTTP 反向代理。它執行於高效能 NewLife.Net 網路庫之上，可透过 NewLife.Agent 安裝為 Windows 服務或 Linux 守護程序，支援 NativeAOT 發佈，並透过 NewLife.Core 提供介面訊息本地化。
+**XProxy** 是 NewLife 生態中的代理伺服器宿主環境。單一程序可寄宿多個 `ProxyBase` 服務，包括 NAT 反向代理、HTTP 正向代理與 HTTP 反向代理。它執行於高效能 NewLife.Net 網路庫之上，可透過 NewLife.Agent 安裝為 Windows 服務或 Linux 守護程序，支援 NativeAOT 發佈，並透過 NewLife.Core 提供介面訊息本地化。
 
 > ℹ️ 本翻譯可能落後，以 [English README](README.md) 為準。
 
@@ -45,7 +45,7 @@ dotnet run --project XProxy
 - **HTTP 正向代理**：接受 absolute-form 請求（`GET http://...` 與 `GET https://...`），支援 Basic 認證、清理代理專用標頭，並依目標協定以 HTTP 或 HTTPS 轉送。
 - **HTTP 反向代理**：為反向對應站台改寫 `Host` 與 `Referer`。
 - **多 IP 出口**：`HttpIp` 支援 `any`、`round`、`random`、`origin` 四種本機來源位址選擇模式。
-- **服務託管**：透过 NewLife.Agent 以 Windows 服務、systemd 單元或主控台程式執行。
+- **服務託管**：透過 NewLife.Agent 以 Windows 服務、systemd 單元或主控台程式執行。
 - **鏈路追蹤**：設定星塵伺服器後上報埋點（JIT 建置；NativeAOT 下關閉）。
 - **設定熱更新**：`Config/XProxy.config` 修改後十秒內自動生效。
 - **NativeAOT 與本地化**：可發佈為自包含原生可執行檔，執行期訊息跟隨所選語言。
